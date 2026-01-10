@@ -23,18 +23,11 @@
       <tr *ngFor="let v of videos">
         <td>
           <a
-            [routerLink]="['/video', v.slug]"
+            [routerLink]="getViewRoute(v)"
             target="_blank"
             rel="noopener noreferrer"
             class="btn btn-sm btn-outline-primary fs-12"
-          >
-            <!-- <img
-              width="40px"
-              [src]="v.thumbnail_url"
-              class="thumb-sm rounded"
-              *ngIf="v.thumbnail_url"
-            /> -->
-            View <i class="fa fa-link"></i>
+          > View
           </a>
         </td>
 

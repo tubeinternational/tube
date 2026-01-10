@@ -3,11 +3,9 @@ const crypto = require("crypto");
 const { absoluteUrl } = require("../utils/url");
 
 /**
+ * =========================
  * GET /api/videos
- * Supports:
- *  - ?q=searchText
- *  - ?category=CategoryName
- *  - pagination
+ * =========================
  */
 exports.getVideos = async (req, res) => {
   try {
@@ -41,8 +39,6 @@ exports.getVideos = async (req, res) => {
     }
 
     params.push(limit, offset);
-    const limitIdx = params.length - 1;
-    const offsetIdx = params.length;
 
     const { rows } = await db.query(
       `
@@ -60,7 +56,7 @@ exports.getVideos = async (req, res) => {
       FROM videos
       ${whereSql}
       ORDER BY created_at DESC
-      LIMIT $${limitIdx} OFFSET $${offsetIdx}
+      LIMIT $${params.length - 1} OFFSET $${params.length}
       `,
       params
     );
@@ -71,11 +67,11 @@ exports.getVideos = async (req, res) => {
         thumbnail_url: absoluteUrl(v.thumbnail_url, req),
         stream_url:
           v.storage_type === "local"
-            ? absoluteUrl(`/api/stream/${v.id}`, req)
-            : absoluteUrl(v.video_url, req),
+            ? `/api/stream/${v.id}`
+            : v.video_url,
       })),
       page,
-      totalPages: Math.ceil(rows.length / limit), // optional improvement later
+      totalPages: Math.ceil(rows.length / limit),
       total: rows.length,
     });
   } catch (err) {
@@ -85,8 +81,9 @@ exports.getVideos = async (req, res) => {
 };
 
 /**
+ * =========================
  * GET /api/videos/slug/:slug
- * NORMAL VIDEO (with likes info)
+ * =========================
  */
 exports.getVideoBySlug = async (req, res) => {
   try {
@@ -125,18 +122,15 @@ exports.getVideoBySlug = async (req, res) => {
 
       FROM videos v
       LEFT JOIN video_likes vl ON vl.video_id = v.id
-
       WHERE v.slug = $1
         AND v.is_active = true
         AND v.video_type = 'normal'
-
       GROUP BY
         v.id, v.title, v.slug, v.description,
         v.meta_title, v.meta_description, v.focus_keywords,
         v.thumbnail_url, v.video_type, v.video_url,
         v.storage_type, v.duration, v.views,
         v.category, v.created_at
-
       LIMIT 1
       `,
       [slug, req.user?.id || null, guestHash]
@@ -153,8 +147,8 @@ exports.getVideoBySlug = async (req, res) => {
       thumbnail_url: absoluteUrl(video.thumbnail_url, req),
       stream_url:
         video.storage_type === "local"
-          ? absoluteUrl(`/api/stream/${video.id}`, req)
-          : absoluteUrl(video.video_url, req),
+          ? `/api/stream/${video.id}`
+          : video.video_url,
     });
   } catch (err) {
     console.error("Fetch video by slug error:", err);
@@ -163,7 +157,9 @@ exports.getVideoBySlug = async (req, res) => {
 };
 
 /**
+ * =========================
  * POST /api/videos/:id/view
+ * =========================
  */
 exports.incrementViews = async (req, res) => {
   try {
@@ -187,7 +183,9 @@ exports.incrementViews = async (req, res) => {
 };
 
 /**
+ * =========================
  * GET /api/videos/:id/related
+ * =========================
  */
 exports.getRelatedVideos = async (req, res) => {
   try {
@@ -222,8 +220,8 @@ exports.getRelatedVideos = async (req, res) => {
         thumbnail_url: absoluteUrl(v.thumbnail_url, req),
         stream_url:
           v.storage_type === "local"
-            ? absoluteUrl(`/api/stream/${v.id}`, req)
-            : absoluteUrl(v.video_url, req),
+            ? `/api/stream/${v.id}`
+            : v.video_url,
       }))
     );
   } catch (err) {
@@ -232,10 +230,10 @@ exports.getRelatedVideos = async (req, res) => {
   }
 };
 
-// SHORTS API ENDPOINTS
-
 /**
+ * =========================
  * GET /api/videos/shorts
+ * =========================
  */
 exports.getShorts = async (req, res) => {
   try {
@@ -271,15 +269,12 @@ exports.getShorts = async (req, res) => {
 
       FROM videos v
       LEFT JOIN video_likes vl ON vl.video_id = v.id
-
       WHERE v.is_active = true
         AND v.video_type = 'short'
-
       GROUP BY
         v.id, v.title, v.slug, v.description,
         v.thumbnail_url, v.video_url, v.storage_type,
         v.duration, v.views, v.created_at
-
       ORDER BY v.created_at DESC
       LIMIT $1 OFFSET $2
       `,
@@ -295,8 +290,8 @@ exports.getShorts = async (req, res) => {
         thumbnail_url: absoluteUrl(v.thumbnail_url, req),
         stream_url:
           v.storage_type === "local"
-            ? absoluteUrl(`/api/stream/${v.id}`, req)
-            : absoluteUrl(v.video_url, req),
+            ? `/api/stream/${v.id}`
+            : v.video_url,
       })),
     });
   } catch (err) {
@@ -306,8 +301,9 @@ exports.getShorts = async (req, res) => {
 };
 
 /**
+ * =========================
  * GET /api/videos/shorts/slug/:slug
- * (WITH likes info)
+ * =========================
  */
 exports.getShortBySlug = async (req, res) => {
   try {
@@ -341,16 +337,13 @@ exports.getShortBySlug = async (req, res) => {
 
       FROM videos v
       LEFT JOIN video_likes vl ON vl.video_id = v.id
-
       WHERE v.slug = $1
         AND v.video_type = 'short'
         AND v.is_active = true
-
       GROUP BY
         v.id, v.title, v.slug, v.description,
         v.thumbnail_url, v.video_url, v.storage_type,
         v.duration, v.views, v.created_at
-
       LIMIT 1
       `,
       [slug, req.user?.id || null, guestHash]
@@ -367,8 +360,8 @@ exports.getShortBySlug = async (req, res) => {
       thumbnail_url: absoluteUrl(v.thumbnail_url, req),
       stream_url:
         v.storage_type === "local"
-          ? absoluteUrl(`/api/stream/${v.id}`, req)
-          : absoluteUrl(v.video_url, req),
+          ? `/api/stream/${v.id}`
+          : v.video_url,
     });
   } catch (err) {
     console.error("Fetch short by slug error:", err);
@@ -376,52 +369,65 @@ exports.getShortBySlug = async (req, res) => {
   }
 };
 
+/**
+ * =========================
+ * POST /api/videos/:id/like
+ * =========================
+ */
 exports.likeVideo = async (req, res) => {
-  const videoId = req.params.id;
-  const userId = req.user?.id || null;
+  try {
+    const videoId = req.params.id;
+    const userId = req.user?.id || null;
 
-  let guestHash = null;
+    let guestHash = null;
 
-  if (!userId) {
-    if (!req.cookies.guest_id) {
-      const newGuestId = crypto.randomUUID();
-      res.cookie("guest_id", newGuestId, {
-        httpOnly: true,
-        sameSite: "lax",
-        maxAge: 1000 * 60 * 60 * 24 * 365,
-      });
-      guestHash = crypto.createHash("sha256").update(newGuestId).digest("hex");
-    } else {
-      guestHash = crypto
-        .createHash("sha256")
-        .update(req.cookies.guest_id)
-        .digest("hex");
+    if (!userId) {
+      if (!req.cookies.guest_id) {
+        const newGuestId = crypto.randomUUID();
+        res.cookie("guest_id", newGuestId, {
+          httpOnly: true,
+          sameSite: "lax",
+          maxAge: 1000 * 60 * 60 * 24 * 365,
+        });
+        guestHash = crypto
+          .createHash("sha256")
+          .update(newGuestId)
+          .digest("hex");
+      } else {
+        guestHash = crypto
+          .createHash("sha256")
+          .update(req.cookies.guest_id)
+          .digest("hex");
+      }
     }
+
+    await db.query(
+      `
+      INSERT INTO video_likes (video_id, user_id, guest_hash)
+      VALUES ($1, $2, $3)
+      ON CONFLICT DO NOTHING
+      `,
+      [videoId, userId, guestHash]
+    );
+
+    const { rows } = await db.query(
+      `SELECT COUNT(*)::int AS likes_count FROM video_likes WHERE video_id = $1`,
+      [videoId]
+    );
+
+    res.json({
+      liked: true,
+      likes_count: rows[0].likes_count,
+    });
+  } catch (err) {
+    console.error("Like video error:", err);
+    res.status(500).json({ error: "Failed to like video" });
   }
-
-  await db.query(
-    `
-    INSERT INTO video_likes (video_id, user_id, guest_hash)
-    VALUES ($1, $2, $3)
-    ON CONFLICT DO NOTHING
-    `,
-    [videoId, userId, guestHash]
-  );
-
-  const { rows } = await db.query(
-    `SELECT COUNT(*)::int AS likes_count FROM video_likes WHERE video_id = $1`,
-    [videoId]
-  );
-
-  res.json({
-    liked: true,
-    likes_count: rows[0].likes_count,
-  });
 };
 
 /**
  * =========================
- * LIST CATEGORIES
+ * GET /api/videos/categories
  * =========================
  */
 exports.listCategories = async (_req, res) => {

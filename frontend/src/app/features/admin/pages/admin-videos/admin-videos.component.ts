@@ -49,6 +49,12 @@ export class AdminVideosComponent implements OnInit {
     });
   }
 
+  getViewRoute(video: Video): any[] {
+    return video.video_type === 'short'
+      ? ['/shorts', video.slug]
+      : ['/video', video.slug];
+  }
+
   openAddModal(): void {
     const ref = this.modal.open(AddVideoComponent, {
       size: 'lg',

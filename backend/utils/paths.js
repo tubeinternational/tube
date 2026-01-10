@@ -1,26 +1,23 @@
 const path = require("path");
 
-/**
- * __dirname => backend/utils
- * project root => two levels up
- */
-const PROJECT_ROOT = path.resolve(__dirname, "..", "..");
+// MUST MATCH multer destination
+const UPLOADS_ROOT = "/app/uploads";
 
-const UPLOADS_DIR = path.join(PROJECT_ROOT, "uploads");
-const VIDEOS_DIR = path.join(UPLOADS_DIR, "videos");
-const THUMBS_DIR = path.join(UPLOADS_DIR, "thumbnails");
+const VIDEOS_DIR = path.join(UPLOADS_ROOT, "videos");
+const THUMBS_DIR = path.join(UPLOADS_ROOT, "thumbnails");
 
 function resolveUploadPath(publicPath) {
   if (!publicPath || !publicPath.startsWith("/uploads/")) return null;
 
-  // Remove leading slash for Windows compatibility
-  const relativePath = publicPath.replace(/^\/+/, "");
-  return path.join(PROJECT_ROOT, relativePath);
+  // /uploads/videos/x.mp4 → /app/uploads/videos/x.mp4
+  return path.join(
+    UPLOADS_ROOT,
+    publicPath.replace("/uploads/", "")
+  );
 }
 
 module.exports = {
-  PROJECT_ROOT,
-  UPLOADS_DIR,
+  UPLOADS_ROOT,
   VIDEOS_DIR,
   THUMBS_DIR,
   resolveUploadPath,

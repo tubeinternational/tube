@@ -1,16 +1,25 @@
 function absoluteUrl(path, req) {
   if (!path) return null;
 
-  // Already absolute (Cloudflare / CDN)
+  // Already absolute
   if (path.startsWith("http://") || path.startsWith("https://")) {
     return path;
   }
 
-  const base =
-    process.env.APP_URL ||
-    `${req.protocol}://${req.get("host")}`;
+  // Static uploads stay relative
+  if (path.startsWith("/uploads/")) {
+    return path;
+  }
 
-  return `${base}${path}`;
+  // Correct host + port from proxy
+  const protocol =
+    req.headers["x-forwarded-proto"] || req.protocol;
+
+  const host =
+    req.headers["x-forwarded-host"] ||
+    req.headers["host"];
+
+  return `${protocol}://${host}${path}`;
 }
 
 module.exports = { absoluteUrl };

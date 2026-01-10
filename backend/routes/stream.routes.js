@@ -4,7 +4,8 @@ const db = require("../db");
 const fs = require("fs");
 const axios = require("axios");
 const rateLimit = require("express-rate-limit");
-const { resolveUploadPath } = require("../utils/paths");
+const mime = require("mime-types");
+const { resolveUploadPath } = require('../utils/paths')
 
 const streamLimiter = rateLimit({
   windowMs: 60 * 1000,
@@ -28,15 +29,21 @@ router.get("/stream/:id", streamLimiter, async (req, res) => {
     // ================= LOCAL =================
     if (storage_type === "local") {
       const filePath = resolveUploadPath(video_url);
-      if (!filePath || !fs.existsSync(filePath)) return res.sendStatus(404);
+      if (!filePath || !fs.existsSync(filePath)) {
+        return res.sendStatus(404);
+      }
 
       const stat = fs.statSync(filePath);
       const fileSize = stat.size;
+      const contentType =
+        mime.lookup(filePath) || "application/octet-stream";
 
+      // 🔑 Required for HTML5 video
       if (!range) {
         res.writeHead(200, {
           "Content-Length": fileSize,
-          "Content-Type": "video/mp4",
+          "Content-Type": contentType,
+          "Accept-Ranges": "bytes",
         });
         fs.createReadStream(filePath).pipe(res);
         return;
@@ -56,7 +63,7 @@ router.get("/stream/:id", streamLimiter, async (req, res) => {
         "Content-Range": `bytes ${start}-${end}/${fileSize}`,
         "Accept-Ranges": "bytes",
         "Content-Length": chunkSize,
-        "Content-Type": "video/mp4",
+        "Content-Type": contentType,
       });
 
       fs.createReadStream(filePath, { start, end }).pipe(res);

@@ -2,8 +2,8 @@ const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
 
-// absolute uploads root (outside backend)
-const UPLOADS_ROOT = path.resolve(__dirname, "../../uploads");
+// 🔑 Docker-mounted uploads directory
+const UPLOADS_ROOT = "/app/uploads";
 
 const ensureDir = (dir) => {
   if (!fs.existsSync(dir)) {
@@ -19,6 +19,8 @@ const storage = multer.diskStorage({
       uploadPath = path.join(UPLOADS_ROOT, "videos");
     } else if (file.fieldname === "thumbnail") {
       uploadPath = path.join(UPLOADS_ROOT, "thumbnails");
+    } else {
+      return cb(new Error("Invalid field name"));
     }
 
     ensureDir(uploadPath);
@@ -35,9 +37,33 @@ const storage = multer.diskStorage({
   },
 });
 
+const uploadVideoAndThumbnail = multer({
+  storage,
+  limits: {
+    fileSize: 2 * 1024 * 1024 * 1024, // ✅ 2GB max per file
+  },
+  fileFilter: (req, file, cb) => {
+    if (file.fieldname === "video") {
+      // Allow common video formats
+      if (!file.mimetype.startsWith("video/")) {
+        return cb(new Error("Only video files are allowed"), false);
+      }
+    }
+
+    if (file.fieldname === "thumbnail") {
+      // Allow only images
+      if (!file.mimetype.startsWith("image/")) {
+        return cb(new Error("Only image files are allowed"), false);
+      }
+    }
+
+    cb(null, true);
+  },
+}).fields([
+  { name: "video", maxCount: 1 },
+  { name: "thumbnail", maxCount: 1 },
+]);
+
 module.exports = {
-  uploadVideoAndThumbnail: multer({ storage }).fields([
-    { name: "video", maxCount: 1 },
-    { name: "thumbnail", maxCount: 1 },
-  ]),
+  uploadVideoAndThumbnail,
 };
