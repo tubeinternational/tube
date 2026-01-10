@@ -1,0 +1,12 @@
+{
+  "name": "hoetube-root",
+  "private": true,
+  "scripts": {
+    "frontend": "npm run start --prefix frontend",
+    "backend": "npm run dev --prefix backend",
+    "dev": "concurrently \"npm run backend\" \"npm run frontend\""
+  },
+  "devDependencies": {
+    "concurrently": "^9.0.0"
+  }
+}

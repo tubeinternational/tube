@@ -1,0 +1,140 @@
+<header>
+  <div class="header-left">
+    <i class="fas fa-bars menu-btn" id="menuBtn" #menuBtn></i>
+    <div class="logo">HOE<span>TUBE</span></div>
+  </div>
+
+  <!-- Desktop Search Bar -->
+  <ng-container>
+    <div class="search-bar desktop-search">
+      <input
+        type="text"
+        placeholder="Search videos..."
+        [(ngModel)]="searchTerm"
+        (keyup.enter)="search()"
+      />
+      <button (click)="search()">
+        <i class="fas fa-search"></i>
+      </button>
+    </div>
+  </ng-container>
+
+  <div class="header-right">
+    <!-- Mobile Search Icon Button -->
+    <button
+      class="search-icon-btn mobile-search-btn"
+      (click)="toggleSearchBar()"
+      aria-label="Toggle search"
+    >
+      <i class="fas fa-search"></i>
+    </button>
+    <ng-container *ngIf="isAdmin">
+      <p class="mb-0 fw-semibold">
+        {{ userEmail }}
+      </p>
+
+      <button class="btn btn-login" (click)="logout()" aria-label="Logout">
+        Logout <i class="fa-solid ms-1 fa-arrow-right-from-bracket"></i>
+      </button>
+    </ng-container>
+
+    <ng-container *ngIf="!isAdmin">
+      <a
+        [routerLink]="['/shorts']"
+        class="btn border-secondary p-0 d-flex align-items-center justify-content-center"
+        style="background: black"
+      >
+        <img src="./short-icon.png" alt="icon" width="40px" />
+      </a>
+    </ng-container>
+  </div>
+
+  <!-- Mobile Search Dropdown -->
+  <ng-container>
+    <div class="mobile-search-dropdown" [class.active]="searchBarOpen">
+      <input
+        type="text"
+        placeholder="Search videos..."
+        [(ngModel)]="searchTerm"
+        (keyup.enter)="search()"
+        class="mobile-search-input"
+        #mobileSearchInput
+      />
+      <button (click)="search()" class="mobile-search-submit">
+        <i class="fas fa-search"></i>
+      </button>
+    </div>
+  </ng-container>
+</header>
+
+<div class="overlay" id="overlay" #overlay></div>
+
+<aside class="sidebar" id="sidebar" #sidebar>
+  <ul class="ps-0">
+    <li>
+      <a [routerLink]="['/home']" class="nav-link"
+        ><i class="fas fa-home"></i> Home</a
+      >
+    </li>
+    <li>
+      <a href="#" class="nav-link"><i class="fas fa-fire"></i> Trending</a>
+    </li>
+  </ul>
+
+  <hr style="border-color: var(--border); margin: 10px 0" />
+
+  <div class="nav-section-title">FANTASY</div>
+  <button
+    type="button"
+    class="dropdown-btn"
+    id="catBtn"
+    (click)="toggleCategories()"
+    aria-haspopup="true"
+    [attr.aria-expanded]="categoriesOpen"
+    aria-controls="catDropdown"
+  >
+    <span
+      ><i
+        class="fas fa-list"
+        style="color: var(--primary); margin-right: 15px; width: 25px"
+      ></i>
+      Categories</span
+    >
+    <i
+      class="fas fa-chevron-down"
+      id="catIcon"
+      [class.rotate-icon]="categoriesOpen"
+      style="font-size: 0.8rem"
+    ></i>
+  </button>
+  <!-- CATEGORIES LIST DROPDOWN -->
+  <div
+    class="dropdown-content"
+    id="catDropdown"
+    [class.show-dropdown]="categoriesOpen"
+  >
+    <a
+      class="dropdown-item"
+      *ngFor="let item of categoriesList"
+      (click)="onCategorySelect(item.name)"
+    >
+      {{ item.name }}
+    </a>
+  </div>
+
+  <hr style="border-color: var(--border); margin: 10px 0" />
+
+  <!-- <ul class="ps-0">
+    <li>
+      <a href="#" class="nav-link"
+        ><i class="fas fa-user-circle"></i> Creators</a
+      >
+    </li>
+  </ul> -->
+</aside>
+
+<div class="main-container" id="mainContainer" #mainContainer>
+  <router-outlet></router-outlet>
+</div>
+
+<!-- JavaScript moved to `layout.component.ts` for Angular lifecycle handling -->

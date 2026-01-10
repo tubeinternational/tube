@@ -1,0 +1,26 @@
+<div class="shorts-actions">
+  <!-- Like -->
+  <button
+    class="action-btn"
+    [class.liked]="liked"
+    (click)="onLike(); $event.stopPropagation()"
+  >
+    ❤️ <span>{{ likes }}</span>
+  </button>
+
+  <!-- Mute / Unmute -->
+  <button
+    class="action-btn"
+    (click)="onToggleMute(); $event.stopPropagation()"
+  >
+    {{ muted ? '🔇' : '🔊' }}
+  </button>
+
+  <!-- Share -->
+  <button
+    class="action-btn"
+    (click)="onShare(); $event.stopPropagation()"
+  >
+    🔗
+  </button>
+</div>

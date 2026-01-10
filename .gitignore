@@ -1,0 +1,30 @@
+# env
+.env
+.env.*
+
+# node
+node_modules/
+
+# uploads
+uploads/*
+!uploads/**/.gitkeep
+
+# logs
+*.log
+
+# build
+dist/
+
+# Angular / tooling
+.angular/
+.cache/
+
+# OS / Editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# database dumps
+db/*.dump
+db/*.sql.bak

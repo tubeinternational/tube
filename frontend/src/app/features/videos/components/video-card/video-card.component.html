@@ -1,0 +1,22 @@
+<div class="video-card" (click)="openVideo()">
+  <div class="thumbnail">
+    <img
+      [src]="video.thumbnail_url || ''"
+      [alt]="video.meta_title || video.title"
+    />
+    <div *ngIf="!video.thumbnail_url" class="thumb-placeholder"></div>
+
+    <span class="duration" *ngIf="video.duration">
+      {{ video.duration | number }}s
+    </span>
+  </div>
+
+  <div class="video-info">
+    <!-- <div class="uploader-avatar"></div> -->
+
+    <div class="video-details">
+      <div class="video-title">{{ video.title }}</div>
+      <div class="meta-data">{{ video.views || 0 }} views</div>
+    </div>
+  </div>
+</div>

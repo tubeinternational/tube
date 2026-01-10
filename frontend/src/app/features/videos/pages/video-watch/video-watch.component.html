@@ -1,0 +1,142 @@
+<div *ngIf="loading" class="watch-loading">Loading video...</div>
+
+<div *ngIf="!loading && video" class="watch-page">
+  <!-- VIDEO PLAYER -->
+  <div class="video-player-container">
+    <div
+      class="player-wrapper"
+      (mousemove)="showControls()"
+      (mouseleave)="hideControlsLater()"
+    >
+      <video
+        #videoEl
+        preload="metadata"
+        [poster]="video.thumbnail_url"
+        (loadedmetadata)="onLoadedMetadata($event)"
+        (timeupdate)="onTimeUpdate($event)"
+        (click)="togglePlay()"
+        (play)="isPlaying = true"
+        (pause)="isPlaying = false"
+        playsinline
+        controlsList="nodownload noremoteplayback"
+        disablePictureInPicture
+        (contextmenu)="$event.preventDefault()"
+        [src]="video.stream_url"
+      ></video>
+
+      <!-- CUSTOM OVERLAY -->
+      <div
+        class="player-overlay"
+        [class.show-controls]="controlsVisible"
+        (click)="togglePlay()"
+      >
+        <!-- BIG PLAY BUTTON -->
+        <div class="play-button-overlay" *ngIf="!isPlaying">
+          <button
+            class="play-button-large"
+            (click)="togglePlay(); $event.stopPropagation()"
+          >
+            ▶
+          </button>
+        </div>
+
+        <!-- CONTROLS BAR -->
+        <div class="controls-bar">
+          <div class="progress-container" (click)="seek($event)">
+            <div class="progress-fill" [style.width.%]="progress"></div>
+
+            <input
+              class="progress-bar"
+              type="range"
+              min="0"
+              [max]="duration"
+              [(ngModel)]="currentTime"
+              (input)="scrub($event)"
+            />
+          </div>
+
+          <div class="controls-row">
+            <div class="controls-left">
+              <button
+                class="control-btn"
+                (click)="togglePlay(); $event.stopPropagation()"
+              >
+                {{ isPlaying ? "⏸" : "▶" }}
+              </button>
+
+              <div class="volume-control">
+                <button class="control-btn" (click)="toggleMute()">
+                  {{ muted ? "🔇" : "🔊" }}
+                </button>
+
+                <input
+                  class="volume-slider"
+                  type="range"
+                  min="0"
+                  max="1"
+                  step="0.05"
+                  (input)="setVolume($event)"
+                />
+              </div>
+            </div>
+
+            <div class="time-display">
+              {{ currentTime | number : "1.0-0" }} /
+              {{ duration | number : "1.0-0" }}
+            </div>
+
+            <div class="controls-right">
+              <button
+                class="control-btn"
+                (click)="toggleFullscreen(); $event.stopPropagation()"
+              >
+                ⛶
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIDEO INFO -->
+    <div class="video-info">
+      <h1 class="title">{{ video.title }}</h1>
+
+      <div class="meta-row">
+        <span class="views">{{ video.views || 0 }} views</span>
+        <span class="dot">•</span>
+        <span class="date">
+          {{ video.created_at | date : "mediumDate" }}
+        </span>
+      </div>
+
+      <div class="actions">
+        <button
+          class="action-btn"
+          [class.liked]="video.is_liked"
+          (click)="onLike()"
+        >
+          ❤️ {{ video.likes_count || 0 }}
+        </button>
+      </div>
+    </div>
+
+    <!-- DESCRIPTION -->
+    <div class="description-box">
+      <p>{{ video.description || "No description available." }}</p>
+    </div>
+
+    <!-- RELATED VIDEOS -->
+    <div class="related-section" *ngIf="relatedVideos.length">
+      <h3 class="related-title">Related videos</h3>
+
+      <div class="related-grid">
+        <app-video-card
+          *ngFor="let v of relatedVideos"
+          [video]="v"
+          (click)="openRelated(v)"
+        ></app-video-card>
+      </div>
+    </div>
+  </div>
+</div>

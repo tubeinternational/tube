@@ -1,0 +1,101 @@
+<div class="modal-header">
+  <h5 class="modal-title">Edit Video</h5>
+  <button type="button" class="btn-close" (click)="activeModal.dismiss()"></button>
+</div>
+
+<div class="modal-body">
+  <form [formGroup]="form" class="d-flex flex-column gap-3">
+
+    <!-- TITLE -->
+    <div>
+      <label class="form-label">Title</label>
+      <input type="text" class="form-control" formControlName="title" />
+    </div>
+
+    <!-- DESCRIPTION -->
+    <div>
+      <label class="form-label">Description</label>
+      <textarea
+        class="form-control"
+        rows="3"
+        formControlName="description"
+      ></textarea>
+    </div>
+
+    <!-- CATEGORY -->
+    <div>
+      <label class="form-label">Category</label>
+      <select class="form-select" formControlName="category">
+        <option value="">Select category</option>
+        <option *ngFor="let c of categories" [value]="c.name">
+          {{ c.name }}
+        </option>
+      </select>
+    </div>
+
+    <hr />
+
+    <!-- SEO -->
+    <h6 class="fw-semibold">SEO Metadata</h6>
+
+    <div>
+      <label class="form-label">Meta Title</label>
+      <input type="text" class="form-control" formControlName="metaTitle" />
+    </div>
+
+    <div>
+      <label class="form-label">Meta Description</label>
+      <textarea
+        class="form-control"
+        rows="2"
+        formControlName="metaDescription"
+      ></textarea>
+    </div>
+
+    <div>
+      <label class="form-label">Focus Keywords</label>
+      <input
+        type="text"
+        class="form-control"
+        formControlName="focusKeywords"
+        placeholder="keyword1, keyword2"
+      />
+    </div>
+
+    <hr />
+
+    <!-- THUMBNAIL -->
+    <div>
+      <label class="form-label">Replace Thumbnail (optional)</label>
+      <input
+        type="file"
+        class="form-control"
+        accept="image/*"
+        (change)="onThumbnailChange($event)"
+      />
+    </div>
+
+    <div *ngIf="video.thumbnail_url" class="mt-2">
+      <small class="text-muted">Current thumbnail:</small><br />
+      <img
+        [src]="video.thumbnail_url"
+        class="rounded mt-1"
+        style="width: 120px; height: auto;"
+      />
+    </div>
+
+  </form>
+</div>
+
+<div class="modal-footer">
+  <button class="btn btn-secondary" (click)="activeModal.dismiss()">
+    Cancel
+  </button>
+  <button
+    class="btn btn-primary"
+    [disabled]="loading"
+    (click)="submit()"
+  >
+    {{ loading ? 'Saving...' : 'Save Changes' }}
+  </button>
+</div>

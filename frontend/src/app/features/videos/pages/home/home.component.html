@@ -1,0 +1,77 @@
+<!-- TAGS BAR -->
+<!-- <div class="tags-bar">
+  <div class="tag active">All</div>
+  <div class="tag">Recommended</div>
+  <div class="tag">Trending</div>
+  <div class="tag">Newest</div>
+  <div class="tag">4K Ultra</div>
+</div> -->
+
+<!-- SEARCH RESULT TITLE -->
+<div *ngIf="query" class="search-result-title">
+  Search results for "{{ query }}"
+</div>
+
+<!-- LOADING -->
+<div *ngIf="loading" class="loading">
+  Loading videos...
+</div>
+
+<!-- EMPTY STATE -->
+<div *ngIf="!loading && videos.length === 0" class="empty">
+  No videos found
+</div>
+
+<!-- VIDEO GRID -->
+<div *ngIf="!loading && videos.length > 0" class="video-grid">
+  <app-video-card
+    *ngFor="let video of videos"
+    [video]="video"
+  ></app-video-card>
+</div>
+
+<!-- PAGINATION -->
+<nav
+  *ngIf="totalPages > 1"
+  class="d-flex justify-content-center mt-4"
+>
+  <ul class="pagination">
+
+    <!-- Prev -->
+    <li class="page-item" [class.disabled]="currentPage === 1">
+      <button
+        class="page-link"
+        (click)="fetchVideos(currentPage - 1)"
+        [disabled]="currentPage === 1"
+      >
+        Prev
+      </button>
+    </li>
+
+    <!-- Pages -->
+    <li
+      class="page-item"
+      *ngFor="let page of pages"
+      [class.active]="page === currentPage"
+    >
+      <button
+        class="page-link"
+        (click)="fetchVideos(page)"
+      >
+        {{ page }}
+      </button>
+    </li>
+
+    <!-- Next -->
+    <li class="page-item" [class.disabled]="currentPage === totalPages">
+      <button
+        class="page-link"
+        (click)="fetchVideos(currentPage + 1)"
+        [disabled]="currentPage === totalPages"
+      >
+        Next
+      </button>
+    </li>
+
+  </ul>
+</nav>

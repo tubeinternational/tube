@@ -1,0 +1,159 @@
+<div class="modal-header">
+  <h5 class="modal-title">Upload Video</h5>
+  <button class="btn-close" (click)="activeModal.dismiss()"></button>
+</div>
+
+<div class="modal-body">
+  <form [formGroup]="form" class="d-flex flex-column gap-3">
+    <!-- TITLE -->
+    <div>
+      <label class="form-label">Title *</label>
+      <input class="form-control" formControlName="title" />
+    </div>
+
+    <!-- DESCRIPTION -->
+    <div>
+      <label class="form-label">Description</label>
+      <textarea
+        class="form-control"
+        rows="3"
+        formControlName="description"
+      ></textarea>
+    </div>
+
+    <!-- CATEGORY -->
+    <div>
+      <label class="form-label">Category</label>
+
+      <div class="d-flex gap-2">
+        <select class="form-select" formControlName="category">
+          <option value="">Select category</option>
+          <option *ngFor="let c of categories" [value]="c.name">
+            {{ c.name }}
+          </option>
+        </select>
+
+        <button
+          type="button"
+          class="btn btn-outline-secondary"
+          (click)="showAddCategory = !showAddCategory"
+        >
+          +
+        </button>
+      </div>
+
+      <!-- ADD CATEGORY -->
+      <div *ngIf="showAddCategory" class="mt-2">
+        <input
+          class="form-control"
+          placeholder="New category name"
+          formControlName="newCategory"
+        />
+
+        <button
+          type="button"
+          class="btn btn-sm btn-primary mt-2"
+          (click)="addCategory()"
+        >
+          Add Category
+        </button>
+      </div>
+    </div>
+
+    <hr />
+
+    <!-- SEO -->
+    <h6 class="fw-semibold">SEO Metadata</h6>
+
+    <div>
+      <label class="form-label">Meta Title</label>
+      <input class="form-control" formControlName="metaTitle" />
+    </div>
+
+    <div>
+      <label class="form-label">Meta Description</label>
+      <textarea
+        class="form-control"
+        rows="2"
+        formControlName="metaDescription"
+      ></textarea>
+    </div>
+
+    <div>
+      <label class="form-label">Focus Keywords</label>
+      <input
+        class="form-control"
+        formControlName="focusKeywords"
+        placeholder="keyword1, keyword2"
+      />
+    </div>
+
+    <hr />
+
+    <!-- SOURCE TYPE -->
+    <div>
+      <label class="form-label">Video Source *</label>
+      <select class="form-select" formControlName="sourceType">
+        <option value="cloudflare">Cloudflare Video</option>
+        <option value="local">Upload Video</option>
+      </select>
+    </div>
+
+    <div>
+      <label class="form-label">Video Type</label>
+      <select class="form-select" formControlName="videoType">
+        <option value="normal">Normal</option>
+        <option value="short">Short</option>
+      </select>
+    </div>
+
+    <hr>
+
+    <!-- THUMBNAIL -->
+    <div>
+      <label class="form-label">Thumbnail *</label>
+      <input
+        type="file"
+        class="form-control"
+        accept="image/*"
+        (change)="onThumbnailSelect($event)"
+      />
+    </div>
+
+    <!-- LOCAL VIDEO -->
+    <div *ngIf="form.value.sourceType === 'local'">
+      <label class="form-label">Video File *</label>
+      <input
+        type="file"
+        class="form-control"
+        accept="video/*"
+        (change)="onVideoSelect($event)"
+      />
+    </div>
+
+    <!-- CLOUDFLARE VIDEO -->
+    <div *ngIf="form.value.sourceType === 'cloudflare'">
+      <label class="form-label">Cloudflare MP4 URL *</label>
+      <input
+        type="text"
+        class="form-control"
+        formControlName="videoUrl"
+        placeholder="https://..."
+      />
+    </div>
+  </form>
+</div>
+
+<div class="modal-footer">
+  <button
+    class="btn btn-secondary"
+    (click)="activeModal.dismiss()"
+    [disabled]="submitting"
+  >
+    Cancel
+  </button>
+
+  <button class="btn btn-primary" (click)="submit()" [disabled]="submitting">
+    {{ submitting ? "Uploading…" : "Upload Video" }}
+  </button>
+</div>

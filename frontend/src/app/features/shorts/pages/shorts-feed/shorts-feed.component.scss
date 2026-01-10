@@ -1,0 +1,32 @@
+/* Full page black */
+.shorts-feed {
+  height: 90vh;
+  top: 10%;
+//   background: black;
+  display: flex;
+  justify-content: center;
+  overflow: hidden;
+  // margin-top: 52px !important;
+}
+
+/* This is the YouTube Shorts stage */
+.shorts-stage {
+  width: 100%;
+  max-width: 420px; // 👈 desktop shorts width
+  height: 100vh;
+  overflow-y: scroll;
+  scroll-snap-type: y mandatory;
+  scrollbar-width: none;
+}
+
+.shorts-stage::-webkit-scrollbar {
+  display: none;
+}
+
+/* Single short */
+.short {
+  position: relative;
+  height: 100vh;
+  scroll-snap-align: start;
+  overflow: hidden;
+}

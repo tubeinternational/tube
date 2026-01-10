@@ -1,0 +1,14 @@
+<video
+  #videoEl
+  class="shorts-video"
+  [poster]="poster"
+  preload="metadata"
+  playsinline
+  muted
+  (click)="togglePlay()"
+  controlsList="nodownload noremoteplayback"
+  disablePictureInPicture
+  (contextmenu)="$event.preventDefault()"
+>
+  <source [src]="src" type="video/mp4" />
+</video>

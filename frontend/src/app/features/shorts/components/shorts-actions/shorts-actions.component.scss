@@ -1,0 +1,28 @@
+.shorts-actions {
+  position: absolute;
+  right: 12px;
+  bottom: 120px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.action-btn {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 20px;
+  text-align: center;
+  cursor: pointer;
+
+  span {
+    display: block;
+    font-size: 12px;
+    margin-top: 4px;
+    opacity: 0.9;
+  }
+
+  &.liked {
+    color: #ff2d55;
+  }
+}

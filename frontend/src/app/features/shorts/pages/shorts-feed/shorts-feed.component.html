@@ -1,0 +1,32 @@
+<div class="shorts-feed">
+  <div class="shorts-stage">
+    <div
+      class="short"
+      *ngFor="let video of shorts; let i = index"
+      #shortEl
+      (click)="setActive(i)"
+    >
+      <app-shorts-player
+        *ngIf="video.stream_url"
+        [src]="video.stream_url"
+        [poster]="video.thumbnail_url"
+        [active]="i === activeIndex"
+        [muted]="muted"
+      ></app-shorts-player>
+
+      <div class="overlay"></div>
+
+      <div class="short-info">
+        <p class="caption">{{ video.title }}</p>
+      </div>
+
+      <app-shorts-actions
+        [likes]="video.likes_count || 0"
+        [liked]="video.is_liked || false"
+        [muted]="muted"
+        (toggleMute)="muted = !muted"
+        (like)="onLike(video)"
+      ></app-shorts-actions>
+    </div>
+  </div>
+</div>
