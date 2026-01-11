@@ -193,7 +193,6 @@ export class LayoutComponent implements AfterViewInit, OnDestroy {
   getCategoriesList() {
     this.adminService.getCategories().subscribe({
       next: (res) => {
-        console.log(res);
         this.categoriesList = res;
       },
     });

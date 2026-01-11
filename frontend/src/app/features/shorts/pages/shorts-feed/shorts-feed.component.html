@@ -24,6 +24,7 @@
         [likes]="video.likes_count || 0"
         [liked]="video.is_liked || false"
         [muted]="muted"
+        [slug]="video.slug"
         (toggleMute)="muted = !muted"
         (like)="onLike(video)"
       ></app-shorts-actions>

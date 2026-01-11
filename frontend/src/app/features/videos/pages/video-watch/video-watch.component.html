@@ -118,6 +118,14 @@
         >
           ❤️ {{ video.likes_count || 0 }}
         </button>
+
+        <div class="share-wrapper">
+          <button class="action-btn" (click)="onShare()">
+            Share <i class="fa fa-link"></i>
+          </button>
+
+          <span class="copied-text" *ngIf="copied"> Link copied </span>
+        </div>
       </div>
     </div>
 

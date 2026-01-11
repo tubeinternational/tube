@@ -23,6 +23,7 @@ export class VideoWatchComponent implements OnInit {
   video?: Video;
   relatedVideos: Video[] = [];
   loading = true;
+  copied = false;
 
   // =====================
   // PLAYER STATE
@@ -176,5 +177,28 @@ export class VideoWatchComponent implements OnInit {
       this.video!.is_liked = true;
       this.video!.likes_count = res.likes_count;
     });
+  }
+
+  onShare() {
+    if (!this.video?.slug) return;
+
+    const url = `${window.location.origin}/video/${this.video.slug}`;
+
+    const showCopied = () => {
+      this.copied = true;
+      setTimeout(() => (this.copied = false), 1200);
+    };
+
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(url).then(showCopied);
+    } else {
+      const input = document.createElement('input');
+      input.value = url;
+      document.body.appendChild(input);
+      input.select();
+      document.execCommand('copy');
+      document.body.removeChild(input);
+      showCopied();
+    }
   }
 }

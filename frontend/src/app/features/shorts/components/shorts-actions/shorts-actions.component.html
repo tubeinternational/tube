@@ -9,18 +9,14 @@
   </button>
 
   <!-- Mute / Unmute -->
-  <button
-    class="action-btn"
-    (click)="onToggleMute(); $event.stopPropagation()"
-  >
-    {{ muted ? '🔇' : '🔊' }}
+  <button class="action-btn" (click)="onToggleMute(); $event.stopPropagation()">
+    {{ muted ? "🔇" : "🔊" }}
   </button>
 
   <!-- Share -->
-  <button
-    class="action-btn"
-    (click)="onShare(); $event.stopPropagation()"
-  >
+  <button class="action-btn" (click)="onShare(); $event.stopPropagation()">
     🔗
   </button>
+
+  <div class="copied-text" *ngIf="copied">Link copied</div>
 </div>
