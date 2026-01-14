@@ -345,18 +345,81 @@ exports.createCategory = async (req, res) => {
 
     const slug = generateSlug(name);
 
+    let imagePath = null;
+    if (req.file) {
+      imagePath = `/uploads/category/${req.file.filename}`;
+    }
+
     await db.query(
       `
-      INSERT INTO video_categories (name, slug)
-      VALUES ($1, $2)
+      INSERT INTO video_categories (name, slug, image_path)
+      VALUES ($1, $2, $3)
       ON CONFLICT (name) DO NOTHING
       `,
-      [name.trim(), slug]
+      [name.trim(), slug, imagePath]
     );
 
     res.json({ success: true });
   } catch (err) {
     console.error("Create category error:", err);
     res.status(500).json({ error: "Failed to create category" });
+  }
+};
+
+/**
+ * =========================
+ * BULK DELETE CATEGORIES
+ * =========================
+ */
+
+exports.deleteCategories = async (req, res) => {
+  const { categoryIds } = req.body;
+
+  if (!Array.isArray(categoryIds) || !categoryIds.length) {
+    return res.status(400).json({ error: "Category IDs required" });
+  }
+
+  const client = await db.connect();
+
+  try {
+    await client.query("BEGIN");
+
+    // 1️⃣ Fetch image paths
+    const { rows } = await client.query(
+      `
+      SELECT image_path
+      FROM video_categories
+      WHERE id = ANY($1)
+      `,
+      [categoryIds]
+    );
+
+    // 2️⃣ Delete DB records
+    await client.query(
+      `
+      DELETE FROM video_categories
+      WHERE id = ANY($1)
+      `,
+      [categoryIds]
+    );
+
+    // 3️⃣ Delete images from disk
+    for (const row of rows) {
+      if (!row.image_path) continue;
+
+      const filePath = resolveUploadPath(row.image_path);
+      if (filePath && fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+      }
+    }
+
+    await client.query("COMMIT");
+    res.json({ success: true });
+  } catch (err) {
+    await client.query("ROLLBACK");
+    console.error("Delete categories error:", err);
+    res.status(500).json({ error: "Failed to delete categories" });
+  } finally {
+    client.release();
   }
 };

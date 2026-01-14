@@ -3,6 +3,7 @@ const router = express.Router();
 const authMiddleware = require("../middleware/auth");
 const { uploadVideoAndThumbnail } = require("../middleware/upload");
 const adminController = require("../controllers/admin.controller");
+const { uploadCategoryImage } = require("../middleware/upload");
 
 /**
  * ADMIN ROLE CHECK
@@ -27,6 +28,20 @@ router.post("/video", uploadVideoAndThumbnail, adminController.addVideo);
 router.get("/videos", adminController.listVideos);
 router.put("/video/:id", uploadVideoAndThumbnail, adminController.updateVideo);
 router.delete("/video/:id", adminController.deleteVideo);
-router.post("/categories", adminController.createCategory);
+
+
+// CATEGORIES
+router.post(
+  "/categories",
+  uploadCategoryImage,
+  adminController.createCategory
+);
+
+router.delete(
+  "/categories",
+  authMiddleware,
+  adminController.deleteCategories
+);
+
 
 module.exports = router;

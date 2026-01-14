@@ -76,6 +76,13 @@ export const routes: Routes = [
             './features/admin/pages/admin-videos/admin-videos.component'
           ).then((m) => m.AdminVideosComponent),
       },
+      {
+        path: 'categories',
+        loadComponent: () =>
+          import(
+            './features/videos/pages/category/category.component'
+          ).then((m) => m.CategoryComponent),
+      },
     ],
   },
 

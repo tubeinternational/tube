@@ -2,7 +2,11 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
 import { environment } from '../../../../environments/environment';
-import { PaginatedVideos, Video, VideoCategory } from '../../videos/models/video.model';
+import {
+  PaginatedVideos,
+  Video,
+  VideoCategory,
+} from '../../videos/models/video.model';
 
 @Injectable({
   providedIn: 'root',
@@ -17,8 +21,14 @@ export class AdminVideoService {
     return this.http.get<VideoCategory[]>(`${this.baseUrl2}/categories`);
   }
 
-  createCategory(name: string): Observable<any> {
-    return this.http.post(`${this.baseUrl}/categories`, { name });
+  createCategory(data: FormData): Observable<any> {
+    return this.http.post(`${this.baseUrl}/categories`, data);
+  }
+
+  deleteCategories(ids: string[]) {
+    return this.http.delete(`${this.baseUrl}/categories`, {
+      body: { categoryIds: ids },
+    });
   }
 
   /**

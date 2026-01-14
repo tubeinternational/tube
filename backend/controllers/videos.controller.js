@@ -66,9 +66,7 @@ exports.getVideos = async (req, res) => {
         ...v,
         thumbnail_url: absoluteUrl(v.thumbnail_url, req),
         stream_url:
-          v.storage_type === "local"
-            ? `/api/stream/${v.id}`
-            : v.video_url,
+          v.storage_type === "local" ? `/api/stream/${v.id}` : v.video_url,
       })),
       page,
       totalPages: Math.ceil(rows.length / limit),
@@ -219,9 +217,7 @@ exports.getRelatedVideos = async (req, res) => {
         ...v,
         thumbnail_url: absoluteUrl(v.thumbnail_url, req),
         stream_url:
-          v.storage_type === "local"
-            ? `/api/stream/${v.id}`
-            : v.video_url,
+          v.storage_type === "local" ? `/api/stream/${v.id}` : v.video_url,
       }))
     );
   } catch (err) {
@@ -289,9 +285,7 @@ exports.getShorts = async (req, res) => {
         ...v,
         thumbnail_url: absoluteUrl(v.thumbnail_url, req),
         stream_url:
-          v.storage_type === "local"
-            ? `/api/stream/${v.id}`
-            : v.video_url,
+          v.storage_type === "local" ? `/api/stream/${v.id}` : v.video_url,
       })),
     });
   } catch (err) {
@@ -359,9 +353,7 @@ exports.getShortBySlug = async (req, res) => {
       ...v,
       thumbnail_url: absoluteUrl(v.thumbnail_url, req),
       stream_url:
-        v.storage_type === "local"
-          ? `/api/stream/${v.id}`
-          : v.video_url,
+        v.storage_type === "local" ? `/api/stream/${v.id}` : v.video_url,
     });
   } catch (err) {
     console.error("Fetch short by slug error:", err);
@@ -425,21 +417,25 @@ exports.likeVideo = async (req, res) => {
   }
 };
 
-/**
- * =========================
- * GET /api/videos/categories
- * =========================
- */
-exports.listCategories = async (_req, res) => {
+exports.listCategories = async (req, res) => {
   try {
     const { rows } = await db.query(`
-      SELECT id, name
+      SELECT
+        id,
+        name,
+        image_path
       FROM video_categories
       WHERE is_active = true
       ORDER BY name
     `);
 
-    res.json(rows);
+    const categories = rows.map((c) => ({
+      id: c.id,
+      name: c.name,
+      image_url: absoluteUrl(c.image_path, req),
+    }));
+
+    res.json(categories);
   } catch (err) {
     console.error("Fetch categories error:", err);
     res.status(500).json({ error: "Failed to fetch categories" });

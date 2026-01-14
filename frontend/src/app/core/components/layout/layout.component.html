@@ -1,7 +1,9 @@
 <header>
   <div class="header-left">
     <i class="fas fa-bars menu-btn" id="menuBtn" #menuBtn></i>
-    <a [routerLink]="'/home'"><div class="logo">HOE<span>TUBE</span></div></a>
+    <a [routerLink]="'/home'"
+      ><div class="logo">HOE<span>TUBE</span></div></a
+    >
   </div>
 
   <!-- Desktop Search Bar -->
@@ -84,7 +86,10 @@
   <hr style="border-color: var(--border); margin: 10px 0" />
 
   <div class="nav-section-title">FANTASY</div>
-  <button
+  <li>
+    <a [routerLink]="'/categories'" class="nav-link"><i class="fas fa-book"></i> Categories</a>
+  </li>
+  <!-- <button
     type="button"
     class="dropdown-btn"
     id="catBtn"
@@ -107,7 +112,6 @@
       style="font-size: 0.8rem"
     ></i>
   </button>
-  <!-- CATEGORIES LIST DROPDOWN -->
   <div
     class="dropdown-content"
     id="catDropdown"
@@ -120,7 +124,7 @@
     >
       {{ item.name }}
     </a>
-  </div>
+  </div> -->
 
   <hr style="border-color: var(--border); margin: 10px 0" />
 

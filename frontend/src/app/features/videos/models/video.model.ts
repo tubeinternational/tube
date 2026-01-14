@@ -45,8 +45,9 @@ export interface PaginatedVideos {
 }
 
 export interface VideoCategory {
-  id?: string; // optional for now, required after DB migration
+  id: string; // optional for now, required after DB migration
   name: string;
+  image_url?: string | null; // ✅ ADD THIS
   slug?: string; // future SEO / routing
   is_active?: boolean;
   created_at?: string;

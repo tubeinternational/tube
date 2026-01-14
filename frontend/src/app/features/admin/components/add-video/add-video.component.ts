@@ -8,10 +8,7 @@ import {
 } from '@angular/forms';
 import { NgbActiveModal, NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { AdminVideoService } from '../../services/admin-video.service';
-
-interface VideoCategory {
-  name: string;
-}
+import { VideoCategory } from '../../../videos/models/video.model';
 
 @Component({
   selector: 'app-add-video',
@@ -26,6 +23,7 @@ export class AddVideoComponent implements OnInit {
 
   videoFile?: File;
   thumbnailFile?: File;
+  categoryImage?: File;
 
   categories: VideoCategory[] = [];
   showAddCategory = false;
@@ -63,16 +61,33 @@ export class AddVideoComponent implements OnInit {
     });
   }
 
-  addCategory(): void {
-    const newCategory = this.form.value.newCategory?.trim();
-    if (!newCategory) return;
+  onCategoryImageSelect(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files?.length) {
+      this.categoryImage = input.files[0];
+    }
+  }
 
-    this.adminService.createCategory(newCategory).subscribe({
+  addCategory(): void {
+    const name = this.form.value.newCategory?.trim();
+
+    if (!name || !this.categoryImage) {
+      alert('Category name and image are required');
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('name', name);
+    formData.append('category_image', this.categoryImage);
+
+    this.adminService.createCategory(formData).subscribe({
       next: () => {
         this.form.patchValue({ newCategory: '' });
+        this.categoryImage = undefined;
         this.showAddCategory = false;
         this.loadCategories();
       },
+      error: () => alert('Failed to create category'),
     });
   }
 
@@ -97,7 +112,8 @@ export class AddVideoComponent implements OnInit {
     formData.append('title', v.title);
     formData.append('description', v.description || '');
     if (v.category) formData.append('category', v.category);
-    formData.append('video_type', v.videoType); // ✅ IMPORTANT
+
+    formData.append('video_type', v.videoType);
     formData.append('storage_type', v.sourceType);
     formData.append('thumbnail', this.thumbnailFile);
 

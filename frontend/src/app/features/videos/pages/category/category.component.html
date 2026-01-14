@@ -1,0 +1,38 @@
+<div class="d-flex justify-content-end mb-3" *ngIf="isAdmin">
+  <button
+    class="btn btn-danger"
+    [disabled]="!selected.size"
+    (click)="deleteSelected()"
+  >
+    Delete Selected
+  </button>
+</div>
+
+<div class="row g-4">
+  <div
+    class="col-lg-4 col-md-6"
+    *ngFor="let category of categories"
+  >
+    <div class="category-card">
+
+      <!-- ADMIN CHECKBOX -->
+      <div class="admin-check" *ngIf="isAdmin">
+        <input
+          type="checkbox"
+          [checked]="selected.has(category.id)"
+          (change)="toggleSelection(category.id)"
+        />
+      </div>
+
+      <img
+        [src]="category.image_url"
+        [alt]="category.name"
+      />
+
+      <div class="overlay">
+        <h4>{{ category.name }}</h4>
+      </div>
+
+    </div>
+  </div>
+</div>

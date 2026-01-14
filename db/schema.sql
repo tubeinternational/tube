@@ -63,6 +63,7 @@ CREATE TABLE public.video_categories (
     id uuid DEFAULT gen_random_uuid() NOT NULL,
     name character varying(100) NOT NULL,
     slug character varying(120) NOT NULL,
+    image_path text,
     is_active boolean DEFAULT true,
     created_at timestamp without time zone DEFAULT now()
 );
