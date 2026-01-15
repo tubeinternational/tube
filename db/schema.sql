@@ -98,6 +98,7 @@ CREATE TABLE public.videos (
     created_at timestamp without time zone DEFAULT now(),
     updated_at timestamp without time zone DEFAULT now(),
     category text,
+    country character varying(100) NOT NULL,
     storage_type character varying(20) DEFAULT 'local'::character varying,
     playback_policy character varying(20) DEFAULT 'signed'::character varying,
     source_type text,

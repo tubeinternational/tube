@@ -13,13 +13,17 @@
     class="col-lg-4 col-md-6"
     *ngFor="let category of categories"
   >
-    <div class="category-card">
+    <div
+      class="category-card"
+      (click)="openCategory(category)"
+    >
 
       <!-- ADMIN CHECKBOX -->
       <div class="admin-check" *ngIf="isAdmin">
         <input
           type="checkbox"
           [checked]="selected.has(category.id)"
+          (click)="$event.stopPropagation()"
           (change)="toggleSelection(category.id)"
         />
       </div>
@@ -27,6 +31,7 @@
       <img
         [src]="category.image_url"
         [alt]="category.name"
+        class="img-fluid"
       />
 
       <div class="overlay">

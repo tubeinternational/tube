@@ -32,6 +32,7 @@ exports.addVideo = async (req, res) => {
       title,
       description = "",
       category = null,
+      country,
       storage_type,
       video_type = "normal",
       video_url,
@@ -43,7 +44,10 @@ exports.addVideo = async (req, res) => {
     const videoFile = req.files?.video?.[0];
     const thumbFile = req.files?.thumbnail?.[0];
 
-    if (!title || !storage_type || !thumbFile) {
+    // =========================
+    // BASIC VALIDATION
+    // =========================
+    if (!title || !storage_type || !thumbFile || !country) {
       return res.status(400).json({ error: "Missing required fields" });
     }
 
@@ -56,10 +60,14 @@ exports.addVideo = async (req, res) => {
     }
 
     const slug = generateSlug(title);
+
     const keywordsArray = focus_keywords
       ? focus_keywords.split(",").map((k) => k.trim())
       : [];
 
+    // =========================
+    // LOCAL VIDEO UPLOAD
+    // =========================
     if (storage_type === "local") {
       if (!videoFile) {
         return res.status(400).json({ error: "Video file required" });
@@ -71,6 +79,7 @@ exports.addVideo = async (req, res) => {
           title,
           description,
           category,
+          country,
           video_type,
           video_url,
           thumbnail_url,
@@ -80,23 +89,29 @@ exports.addVideo = async (req, res) => {
           meta_description,
           focus_keywords
         )
-        VALUES ($1,$2,$3,$4,$5,$6,'local',$7,$8,$9,$10)
+        VALUES (
+          $1,$2,$3,$4,$5,$6,$7,'local',$8,$9,$10,$11
+        )
         `,
         [
-          title,
-          description,
-          category,
-          video_type,
-          `/uploads/videos/${videoFile.filename}`,
-          `/uploads/thumbnails/${thumbFile.filename}`,
-          slug,
-          meta_title || title,
-          meta_description || description,
-          keywordsArray,
+          title, // $1
+          description, // $2
+          category, // $3
+          country, // $4
+          video_type, // $5
+          `/uploads/videos/${videoFile.filename}`, // $6
+          `/uploads/thumbnails/${thumbFile.filename}`, // $7
+          slug, // $8
+          meta_title || title, // $9
+          meta_description || description, // $10
+          keywordsArray, // $11
         ]
       );
     }
 
+    // =========================
+    // CLOUDFLARE VIDEO
+    // =========================
     if (storage_type === "cloudflare") {
       if (!video_url || !video_url.startsWith("http")) {
         return res
@@ -110,6 +125,7 @@ exports.addVideo = async (req, res) => {
           title,
           description,
           category,
+          country,
           video_type,
           video_url,
           thumbnail_url,
@@ -119,27 +135,32 @@ exports.addVideo = async (req, res) => {
           meta_description,
           focus_keywords
         )
-        VALUES ($1,$2,$3,$4,$5,$6,'cloudflare',$7,$8,$9,$10)
+        VALUES (
+          $1,$2,$3,$4,$5,$6,$7,'cloudflare',$8,$9,$10,$11
+        )
         `,
         [
-          title,
-          description,
-          category,
-          video_type,
-          video_url,
-          `/uploads/thumbnails/${thumbFile.filename}`,
-          slug,
-          meta_title || title,
-          meta_description || description,
-          keywordsArray,
+          title, // $1
+          description, // $2
+          category, // $3
+          country, // $4
+          video_type, // $5
+          video_url, // $6
+          `/uploads/thumbnails/${thumbFile.filename}`, // $7
+          slug, // $8
+          meta_title || title, // $9
+          meta_description || description, // $10
+          keywordsArray, // $11
         ]
       );
     }
 
-    res.json({ success: true });
+    return res.json({ success: true });
   } catch (err) {
-    console.error("Upload error:", err);
-    res.status(500).json({ error: "Upload failed" });
+    console.error("Upload error:", err.message, err);
+    return res.status(500).json({
+      error: err.message || "Upload failed",
+    });
   }
 };
 

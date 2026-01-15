@@ -279,7 +279,7 @@ header {
   border: none;
   cursor: pointer;
   color: var(--text-main);
-  padding: 12px 24px;
+  padding: 12px 18px;
   font-size: 0.95rem;
 }
 .dropdown-btn:hover {
@@ -291,7 +291,7 @@ header {
 }
 .dropdown-content a {
   display: block;
-  padding: 10px 24px 10px 65px; /* Indented */
+  padding: 10px 24px 10px 22px; /* Indented */
   font-size: 0.9rem;
   color: var(--text-muted);
 }

@@ -12,7 +12,7 @@ import { AuthService } from '../../../../auth/services/auth.service';
   templateUrl: './category.component.html',
   styleUrl: './category.component.scss',
 })
-export class CategoryComponent {
+export class CategoryComponent implements OnInit {
   categories: VideoCategory[] = [];
   selected = new Set<string>();
   isAdmin = false;
@@ -20,32 +20,24 @@ export class CategoryComponent {
 
   constructor(
     private adminService: AdminVideoService,
-    private authService: AuthService
+    private authService: AuthService,
+    private router: Router
   ) {
     this.authService.user$.subscribe((user) => {
       this.isAdmin = user?.role === 'ADMIN';
     });
   }
 
-  toggleSelection(id: string): void {
-    this.selected.has(id) ? this.selected.delete(id) : this.selected.add(id);
-  }
-
-  deleteSelected(): void {
-    if (!this.selected.size) return;
-
-    if (!confirm('Delete selected categories?')) return;
-
-    this.adminService.deleteCategories([...this.selected]).subscribe(() => {
-      this.categories = this.categories.filter((c) => !this.selected.has(c.id));
-      this.selected.clear();
-    });
-  }
-
+  // =========================
+  // LIFECYCLE
+  // =========================
   ngOnInit(): void {
     this.loadCategories();
   }
 
+  // =========================
+  // LOAD CATEGORIES
+  // =========================
   loadCategories(): void {
     this.loading = true;
 
@@ -56,6 +48,40 @@ export class CategoryComponent {
       },
       error: () => {
         this.loading = false;
+      },
+    });
+  }
+
+  // =========================
+  // CATEGORY CLICK → NAVIGATE
+  // =========================
+  openCategory(category: VideoCategory): void {
+    this.router.navigate(['/videos'], {
+      queryParams: {
+        category: category.name,
+      },
+    });
+  }
+
+  // =========================
+  // ADMIN SELECTION
+  // =========================
+  toggleSelection(id: string): void {
+    this.selected.has(id)
+      ? this.selected.delete(id)
+      : this.selected.add(id);
+  }
+
+  deleteSelected(): void {
+    if (!this.selected.size) return;
+    if (!confirm('Delete selected categories?')) return;
+
+    this.adminService.deleteCategories([...this.selected]).subscribe({
+      next: () => {
+        this.categories = this.categories.filter(
+          (c) => !this.selected.has(c.id)
+        );
+        this.selected.clear();
       },
     });
   }

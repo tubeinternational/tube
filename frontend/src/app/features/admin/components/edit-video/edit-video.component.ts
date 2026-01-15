@@ -5,7 +5,6 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { Video, VideoCategory } from '../../../videos/models/video.model';
 import { AdminVideoService } from '../../services/admin-video.service';
 
-
 @Component({
   selector: 'app-edit-video',
   standalone: true,
@@ -31,7 +30,7 @@ export class EditVideoComponent implements OnInit {
       title: [''],
       description: [''],
       category: [''],
-
+      country: [''],
       // SEO
       metaTitle: [''],
       metaDescription: [''],
@@ -47,7 +46,7 @@ export class EditVideoComponent implements OnInit {
         title: this.video.title,
         description: this.video.description,
         category: this.video.category,
-
+        country: this.video.country,
         metaTitle: this.video.meta_title,
         metaDescription: this.video.meta_description,
         focusKeywords: this.video.focus_keywords?.join(', '),
@@ -87,6 +86,7 @@ export class EditVideoComponent implements OnInit {
       title,
       description,
       category,
+      country,
       metaTitle,
       metaDescription,
       focusKeywords,
@@ -102,6 +102,7 @@ export class EditVideoComponent implements OnInit {
       if (title) formData.append('title', title);
       if (description) formData.append('description', description);
       if (category) formData.append('category', category);
+      if (country) formData.append('country', country);
 
       if (metaTitle) formData.append('meta_title', metaTitle);
       if (metaDescription) formData.append('meta_description', metaDescription);
@@ -125,6 +126,7 @@ export class EditVideoComponent implements OnInit {
         title: title || undefined,
         description: description || undefined,
         category: category || undefined,
+        country: country || undefined,
         meta_title: metaTitle || undefined,
         meta_description: metaDescription || undefined,
         focus_keywords: focusKeywords || undefined,

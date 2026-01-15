@@ -33,3 +33,7 @@ Persistent database & uploads via Docker volumes
 Use this to apply schema changes without deleting data.
 
 docker exec -it tube-postgres psql -U postgres tube
+
+COMPLETELY REFRESH THE APP 
+
+docker compose up --build --force-recreate

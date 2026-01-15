@@ -1,13 +1,20 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  OnInit,
+  OnDestroy,
+  ViewChild,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
-import { VideoService } from '../../services/video.service';
-import { Video } from '../../models/video.model';
-import { VideoCardComponent } from '../../components/video-card/video-card.component';
-import { environment } from '../../../../../environments/environment';
 import { FormsModule } from '@angular/forms';
 import { Meta, Title } from '@angular/platform-browser';
+import { Subject, takeUntil } from 'rxjs';
+
+import { VideoService } from '../../services/video.service';
 import { ShortsFeedService } from '../../../shorts/services/shorts-feed.service';
+import { Video } from '../../models/video.model';
+import { VideoCardComponent } from '../../components/video-card/video-card.component';
 
 @Component({
   selector: 'app-video-watch',
@@ -16,27 +23,27 @@ import { ShortsFeedService } from '../../../shorts/services/shorts-feed.service'
   templateUrl: './video-watch.component.html',
   styleUrls: ['./video-watch.component.scss'],
 })
-export class VideoWatchComponent implements OnInit {
-  // =====================
-  // VIDEO DATA
-  // =====================
+export class VideoWatchComponent implements OnInit, OnDestroy {
   video?: Video;
   relatedVideos: Video[] = [];
   loading = true;
   copied = false;
 
-  // =====================
-  // PLAYER STATE
-  // =====================
   isPlaying = false;
+  isReady = false;
+  isEnded = false;
   controlsVisible = true;
   muted = false;
 
   currentTime = 0;
   duration = 0;
   progress = 0;
+  volume = 1;
 
   hideTimer: any;
+  private destroy$ = new Subject<void>();
+
+  @ViewChild('videoEl') videoRef!: ElementRef<HTMLVideoElement>;
 
   constructor(
     private route: ActivatedRoute,
@@ -47,15 +54,9 @@ export class VideoWatchComponent implements OnInit {
     private meta: Meta
   ) {}
 
-  @ViewChild('videoEl')
-  videoRef!: ElementRef<HTMLVideoElement>;
-
-  // =====================
-  // SEO
-  // =====================
+  /* ---------------- SEO ---------------- */
   private applySeo(video: Video): void {
     this.title.setTitle(video.meta_title || video.title);
-
     this.meta.updateTag({
       name: 'description',
       content: video.meta_description || video.description || '',
@@ -69,75 +70,109 @@ export class VideoWatchComponent implements OnInit {
     }
   }
 
-  // =====================
-  // PLAYER CONTROLS
-  // =====================
-  togglePlay() {
+  /* ---------------- PLAYER ---------------- */
+  togglePlay(): void {
     const video = this.videoRef.nativeElement;
 
-    // Ensure video has a valid source before attempting to play
-    if (!video.src || !this.video?.stream_url) {
-      return;
-    }
+    if (!video.src) return;
 
-    video.paused ? video.play() : video.pause();
+    if (video.paused || this.isEnded) {
+      this.isEnded = false;
+      video.play().catch(() => {});
+    } else {
+      video.pause();
+    }
   }
 
-  toggleMute() {
+  toggleMute(): void {
     const video = this.videoRef.nativeElement;
     video.muted = !video.muted;
+
+    if (!video.muted && video.volume === 0) {
+      video.volume = 0.5;
+    }
+
     this.muted = video.muted;
   }
 
-  setVolume(e: Event) {
-    const input = e.target as HTMLInputElement;
-    this.videoRef.nativeElement.volume = +input.value;
+  get volumeIcon(): string {
+    const video = this.videoRef?.nativeElement;
+    if (!video || this.muted || video.volume === 0) return 'fa-volume-xmark';
+    if (video.volume < 0.5) return 'fa-volume-low';
+    return 'fa-volume-high';
   }
 
-  onLoadedMetadata(e: Event) {
+  setVolume(e: Event): void {
+    const input = e.target as HTMLInputElement;
+    const video = this.videoRef.nativeElement;
+
+    const vol = +input.value;
+
+    video.muted = false;
+    video.volume = vol;
+
+    this.muted = vol === 0;
+  }
+
+  onLoadedMetadata(e: Event): void {
     const video = e.target as HTMLVideoElement;
     this.duration = video.duration;
+    this.isReady = true;
   }
 
-  onTimeUpdate(e: Event) {
+  onTimeUpdate(e: Event): void {
     const video = e.target as HTMLVideoElement;
     this.currentTime = video.currentTime;
-    this.progress = (this.currentTime / this.duration) * 100;
+    this.progress =
+      this.duration > 0 ? (this.currentTime / this.duration) * 100 : 0;
+
+    if (this.duration && video.currentTime >= this.duration) {
+      this.isEnded = true;
+      this.isPlaying = false;
+    }
   }
 
-  scrub(e: Event) {
+  scrub(e: Event): void {
     const input = e.target as HTMLInputElement;
     this.videoRef.nativeElement.currentTime = +input.value;
   }
 
-  seek(event: MouseEvent) {
+  seek(event: MouseEvent): void {
     const rect = (event.target as HTMLElement).getBoundingClientRect();
     const percent = (event.clientX - rect.left) / rect.width;
     this.videoRef.nativeElement.currentTime = percent * this.duration;
   }
 
-  showControls() {
+  showControls(): void {
     this.controlsVisible = true;
     clearTimeout(this.hideTimer);
   }
 
-  hideControlsLater() {
+  hideControlsLater(): void {
+    if (!this.isPlaying) return;
     this.hideTimer = setTimeout(() => {
       this.controlsVisible = false;
     }, 2000);
   }
 
-  toggleFullscreen() {
-    document.fullscreenElement
-      ? document.exitFullscreen()
-      : this.videoRef.nativeElement.parentElement?.requestFullscreen();
+  toggleFullscreen(): void {
+    const video: any = this.videoRef.nativeElement;
+
+    if (video.webkitEnterFullscreen) {
+      video.webkitEnterFullscreen();
+      return;
+    }
+
+    if (!document.fullscreenElement) {
+      video.requestFullscreen?.();
+    } else {
+      document.exitFullscreen?.();
+    }
   }
 
-  // =====================
-  // LIFECYCLE
-  // =====================
+  /* ---------------- LIFECYCLE ---------------- */
   ngOnInit(): void {
-    this.route.paramMap.subscribe((params) => {
+    this.route.paramMap.pipe(takeUntil(this.destroy$)).subscribe((params) => {
       const slug = params.get('slug');
       if (!slug) return;
 
@@ -147,30 +182,36 @@ export class VideoWatchComponent implements OnInit {
         next: (video) => {
           this.video = video;
           this.loading = false;
-
           this.applySeo(video);
 
-          // Increment views (fire & forget)
-          this.videoService.incrementViews(video.id!).subscribe();
+          this.isPlaying = false;
+          this.isReady = false;
+          this.isEnded = false;
+          this.currentTime = 0;
+          this.progress = 0;
 
-          // Load related videos (NO pagination)
-          this.videoService.getRelatedVideos(video.id!).subscribe((rv) => {
-            this.relatedVideos = rv;
-          });
+          this.videoService.incrementViews(video.id!).subscribe();
+          this.videoService
+            .getRelatedVideos(video.id!)
+            .subscribe((rv) => (this.relatedVideos = rv));
         },
-        error: () => {
-          this.loading = false;
-        },
+        error: () => (this.loading = false),
       });
     });
   }
 
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  /* ---------------- ACTIONS ---------------- */
   openRelated(video: Video): void {
     if (!video.slug) return;
     this.router.navigate(['/video', video.slug]);
   }
 
-  onLike() {
+  onLike(): void {
     if (!this.video || this.video.is_liked) return;
 
     this.shortService.like(this.video.id!).subscribe((res) => {
@@ -179,11 +220,10 @@ export class VideoWatchComponent implements OnInit {
     });
   }
 
-  onShare() {
+  onShare(): void {
     if (!this.video?.slug) return;
 
     const url = `${window.location.origin}/video/${this.video.slug}`;
-
     const showCopied = () => {
       this.copied = true;
       setTimeout(() => (this.copied = false), 1200);

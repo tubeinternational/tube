@@ -39,7 +39,7 @@ export class AddVideoComponent implements OnInit {
       title: ['', Validators.required],
       description: [''],
       category: [''],
-
+      country: ['', Validators.required],
       newCategory: [''],
 
       videoType: ['normal', Validators.required],
@@ -112,7 +112,7 @@ export class AddVideoComponent implements OnInit {
     formData.append('title', v.title);
     formData.append('description', v.description || '');
     if (v.category) formData.append('category', v.category);
-
+    formData.append('country', v.country);
     formData.append('video_type', v.videoType);
     formData.append('storage_type', v.sourceType);
     formData.append('thumbnail', this.thumbnailFile);

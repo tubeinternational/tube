@@ -1,50 +1,43 @@
 <div *ngIf="loading" class="watch-loading">Loading video...</div>
 
 <div *ngIf="!loading && video" class="watch-page">
-  <!-- VIDEO PLAYER -->
   <div class="video-player-container">
     <div
       class="player-wrapper"
       (mousemove)="showControls()"
       (mouseleave)="hideControlsLater()"
     >
+      <!-- VIDEO -->
       <video
         #videoEl
         preload="metadata"
+        playsinline
+        webkit-playsinline
         [poster]="video.thumbnail_url"
+        [src]="video.stream_url"
         (loadedmetadata)="onLoadedMetadata($event)"
         (timeupdate)="onTimeUpdate($event)"
-        (click)="togglePlay()"
         (play)="isPlaying = true"
         (pause)="isPlaying = false"
-        playsinline
         controlsList="nodownload noremoteplayback"
         disablePictureInPicture
         (contextmenu)="$event.preventDefault()"
-        [src]="video.stream_url"
       ></video>
 
-      <!-- CUSTOM OVERLAY -->
-      <div
-        class="player-overlay"
-        [class.show-controls]="controlsVisible"
-        (click)="togglePlay()"
-      >
-        <!-- BIG PLAY BUTTON -->
+      <!-- OVERLAY -->
+      <div class="player-overlay" [class.show-controls]="controlsVisible">
+        <!-- CENTER PLAY -->
         <div class="play-button-overlay" *ngIf="!isPlaying">
-          <button
-            class="play-button-large"
-            (click)="togglePlay(); $event.stopPropagation()"
-          >
-            ▶
+          <button class="play-button-large" (click)="togglePlay()">
+            <i class="fa-solid fa-play"></i>
           </button>
         </div>
 
-        <!-- CONTROLS BAR -->
+        <!-- CONTROLS -->
         <div class="controls-bar">
+          <!-- PROGRESS -->
           <div class="progress-container" (click)="seek($event)">
             <div class="progress-fill" [style.width.%]="progress"></div>
-
             <input
               class="progress-bar"
               type="range"
@@ -57,16 +50,18 @@
 
           <div class="controls-row">
             <div class="controls-left">
-              <button
-                class="control-btn"
-                (click)="togglePlay(); $event.stopPropagation()"
-              >
-                {{ isPlaying ? "⏸" : "▶" }}
+              <!-- PLAY / PAUSE -->
+              <button class="control-btn" (click)="togglePlay()">
+                <i
+                  class="fa-solid"
+                  [ngClass]="isPlaying ? 'fa-pause' : 'fa-play'"
+                ></i>
               </button>
 
+              <!-- VOLUME -->
               <div class="volume-control">
                 <button class="control-btn" (click)="toggleMute()">
-                  {{ muted ? "🔇" : "🔊" }}
+                  <i class="fa-solid" [ngClass]="volumeIcon"></i>
                 </button>
 
                 <input
@@ -75,21 +70,22 @@
                   min="0"
                   max="1"
                   step="0.05"
+                  [value]="volume"
                   (input)="setVolume($event)"
+                  (wheel)="$event.preventDefault()"
                 />
               </div>
             </div>
 
+            <!-- TIME -->
             <div class="time-display">
               {{ currentTime | number : "1.0-0" }} /
               {{ duration | number : "1.0-0" }}
             </div>
 
+            <!-- FULLSCREEN -->
             <div class="controls-right">
-              <button
-                class="control-btn"
-                (click)="toggleFullscreen(); $event.stopPropagation()"
-              >
+              <button class="control-btn" (click)="toggleFullscreen()">
                 ⛶
               </button>
             </div>
@@ -98,33 +94,51 @@
       </div>
     </div>
 
-    <!-- VIDEO INFO -->
-    <div class="video-info">
-      <h1 class="title">{{ video.title }}</h1>
+    <!-- INFO -->
+    <div class="video-info row gy-3 align-items-start">
+      <!-- LEFT -->
+      <div class="col-12 col-lg-7">
+        <h1 class="title mb-1">{{ video.title }}</h1>
 
-      <div class="meta-row">
-        <span class="views">{{ video.views || 0 }} views</span>
-        <span class="dot">•</span>
-        <span class="date">
-          {{ video.created_at | date : "mediumDate" }}
-        </span>
+        <div
+          class="meta-row category-country mt-3"
+          *ngIf="video.category || video.country"
+        >
+          <span class="category" *ngIf="video.category">
+            {{ video.category }}
+          </span>
+          <span class="country" *ngIf="video.country">
+            {{ video.country | titlecase }}
+          </span>
+        </div>
       </div>
 
-      <div class="actions">
-        <button
-          class="action-btn"
-          [class.liked]="video.is_liked"
-          (click)="onLike()"
-        >
-          ❤️ {{ video.likes_count || 0 }}
-        </button>
+      <!-- RIGHT -->
+      <div class="col-12 col-lg-5">
+        <div class="action-container text-lg-end">
+          <div class="meta-row justify-content-lg-end">
+            <span class="views">{{ video.views || 0 }} views</span>
+            <span class="date">
+              {{ video.created_at | date : "mediumDate" }}
+            </span>
+          </div>
 
-        <div class="share-wrapper">
-          <button class="action-btn" (click)="onShare()">
-            Share <i class="fa fa-link"></i>
-          </button>
+          <div class="actions justify-content-lg-end">
+            <button
+              class="action-btn"
+              [class.liked]="video.is_liked"
+              (click)="onLike()"
+            >
+              ❤️ {{ video.likes_count || 0 }}
+            </button>
 
-          <span class="copied-text" *ngIf="copied"> Link copied </span>
+            <div class="share-wrapper position-relative">
+              <button class="action-btn" (click)="onShare()">
+                Share <i class="fa fa-link"></i>
+              </button>
+              <span class="copied-text" *ngIf="copied">Link copied</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -134,10 +148,9 @@
       <p>{{ video.description || "No description available." }}</p>
     </div>
 
-    <!-- RELATED VIDEOS -->
+    <!-- RELATED -->
     <div class="related-section" *ngIf="relatedVideos.length">
       <h3 class="related-title">Related videos</h3>
-
       <div class="related-grid">
         <app-video-card
           *ngFor="let v of relatedVideos"

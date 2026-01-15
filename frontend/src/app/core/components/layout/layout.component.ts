@@ -33,6 +33,7 @@ export class LayoutComponent implements AfterViewInit, OnDestroy {
   mainContainer!: ElementRef<HTMLElement>;
   @ViewChild('mobileSearchInput', { static: false })
   mobileSearchInput!: ElementRef<HTMLInputElement>;
+  dropdownState: Record<string, boolean> = {};
 
   searchBarOpen = false;
   searchTerm = '';
@@ -146,5 +147,13 @@ export class LayoutComponent implements AfterViewInit, OnDestroy {
       queryParams: { q },
       queryParamsHandling: 'merge',
     });
+  }
+
+  toggleDropdown(key: string): void {
+    this.dropdownState[key] = !this.dropdownState[key];
+  }
+
+  isDropdownOpen(key: string): boolean {
+    return !!this.dropdownState[key];
   }
 }

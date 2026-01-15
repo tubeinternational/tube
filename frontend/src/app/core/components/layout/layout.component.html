@@ -87,44 +87,41 @@
 
   <div class="nav-section-title">FANTASY</div>
   <li>
-    <a [routerLink]="'/categories'" class="nav-link"><i class="fas fa-book"></i> Categories</a>
+    <a [routerLink]="'/categories'" class="nav-link"
+      ><i class="fas fa-book"></i> Categories</a
+    >
   </li>
-  <!-- <button
+
+  <!-- PAGES DROPDOWN -->
+  <button
     type="button"
     class="dropdown-btn"
-    id="catBtn"
-    (click)="toggleCategories()"
+    (click)="toggleDropdown('pages')"
     aria-haspopup="true"
-    [attr.aria-expanded]="categoriesOpen"
-    aria-controls="catDropdown"
+    [attr.aria-expanded]="isDropdownOpen('pages')"
   >
-    <span
-      ><i
-        class="fas fa-list"
+    <span>
+      <i
+        class="fa-solid fa-headset"
         style="color: var(--primary); margin-right: 15px; width: 25px"
       ></i>
-      Categories</span
-    >
+      Help Desk
+    </span>
+
     <i
       class="fas fa-chevron-down"
-      id="catIcon"
-      [class.rotate-icon]="categoriesOpen"
+      [class.rotate-icon]="isDropdownOpen('pages')"
       style="font-size: 0.8rem"
     ></i>
   </button>
-  <div
-    class="dropdown-content"
-    id="catDropdown"
-    [class.show-dropdown]="categoriesOpen"
-  >
-    <a
-      class="dropdown-item"
-      *ngFor="let item of categoriesList"
-      (click)="onCategorySelect(item.name)"
-    >
-      {{ item.name }}
+
+  <div class="dropdown-content" [class.show-dropdown]="isDropdownOpen('pages')">
+    <a class="dropdown-item" routerLink="/contact-us"> Contact Us </a>
+
+    <a class="dropdown-item" routerLink="/content-removal-request">
+      Content Removal Request
     </a>
-  </div> -->
+  </div>
 
   <hr style="border-color: var(--border); margin: 10px 0" />
 

@@ -17,6 +17,7 @@ export interface Video {
   duration?: number;
   views?: number;
   category?: string;
+  country?: string;
 
   // 🔥 Engagement (ADD THIS)
   likes_count?: number;

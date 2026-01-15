@@ -108,6 +108,7 @@ exports.getVideoBySlug = async (req, res) => {
         v.duration,
         v.views,
         v.category,
+        v.country,
         v.created_at,
 
         COUNT(vl.id)::int AS likes_count,
@@ -128,7 +129,7 @@ exports.getVideoBySlug = async (req, res) => {
         v.meta_title, v.meta_description, v.focus_keywords,
         v.thumbnail_url, v.video_type, v.video_url,
         v.storage_type, v.duration, v.views,
-        v.category, v.created_at
+        v.category, v.country, v.created_at
       LIMIT 1
       `,
       [slug, req.user?.id || null, guestHash]
