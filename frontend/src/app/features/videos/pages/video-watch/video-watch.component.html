@@ -108,7 +108,11 @@
             {{ video.category }}
           </span>
           <span class="country" *ngIf="video.country">
+            <span *ngIf="countryFlag" class=" pe-2 fi fi-{{ countryFlag }}"></span>
             {{ video.country | titlecase }}
+          </span>
+          <span class="country" *ngIf="!video.country">
+            <i class="fa fa-globe pe-2"></i> Global
           </span>
         </div>
       </div>

@@ -40,11 +40,9 @@
       <label class="form-label">Country</label>
       <select class="form-select" formControlName="country">
         <option value="">Select country</option>
-        <option value="india">India</option>
-        <option value="usa">USA</option>
-        <option value="uk">UK</option>
-        <option value="canada">Canada</option>
-        <option value="global">Global</option>
+        <option *ngFor="let c of countries" [value]="c.country">
+          {{ c.country }}
+        </option>
       </select>
     </div>
 

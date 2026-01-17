@@ -9,6 +9,8 @@ import {
 import { NgbActiveModal, NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { AdminVideoService } from '../../services/admin-video.service';
 import { VideoCategory } from '../../../videos/models/video.model';
+import { Country } from '../../../../shared/models/countries.model';
+import { CountriesService } from '../../../../shared/services/countries.service';
 
 @Component({
   selector: 'app-add-video',
@@ -20,6 +22,7 @@ import { VideoCategory } from '../../../videos/models/video.model';
 export class AddVideoComponent implements OnInit {
   form!: FormGroup;
   submitting = false;
+  countries: Country[] = [];
 
   videoFile?: File;
   thumbnailFile?: File;
@@ -31,7 +34,8 @@ export class AddVideoComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private adminService: AdminVideoService,
-    public activeModal: NgbActiveModal
+    public activeModal: NgbActiveModal,
+    private countriesService: CountriesService
   ) {}
 
   ngOnInit(): void {
@@ -39,7 +43,7 @@ export class AddVideoComponent implements OnInit {
       title: ['', Validators.required],
       description: [''],
       category: [''],
-      country: ['', Validators.required],
+      country: [''],
       newCategory: [''],
 
       videoType: ['normal', Validators.required],
@@ -53,6 +57,7 @@ export class AddVideoComponent implements OnInit {
     });
 
     this.loadCategories();
+      this.countries = this.countriesService.getAllCountries();
   }
 
   loadCategories(): void {

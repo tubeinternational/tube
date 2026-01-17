@@ -15,6 +15,7 @@ exports.getVideos = async (req, res) => {
 
     const q = req.query.q?.trim();
     const category = req.query.category?.trim();
+    const country = req.query.country?.trim(); // ✅ ADD THIS
 
     const params = [];
     let whereSql = `
@@ -36,6 +37,11 @@ exports.getVideos = async (req, res) => {
     if (category) {
       params.push(category);
       whereSql += ` AND category = $${params.length}`;
+    }
+
+    if (country) {
+      params.push(country);
+      whereSql += ` AND country ILIKE $${params.length}`;
     }
 
     params.push(limit, offset);

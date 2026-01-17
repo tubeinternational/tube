@@ -15,6 +15,7 @@ import { VideoService } from '../../services/video.service';
 import { ShortsFeedService } from '../../../shorts/services/shorts-feed.service';
 import { Video } from '../../models/video.model';
 import { VideoCardComponent } from '../../components/video-card/video-card.component';
+import { CountriesService } from '../../../../shared/services/countries.service';
 
 @Component({
   selector: 'app-video-watch',
@@ -28,6 +29,7 @@ export class VideoWatchComponent implements OnInit, OnDestroy {
   relatedVideos: Video[] = [];
   loading = true;
   copied = false;
+  countryFlag?: string;
 
   isPlaying = false;
   isReady = false;
@@ -50,6 +52,7 @@ export class VideoWatchComponent implements OnInit, OnDestroy {
     private router: Router,
     private videoService: VideoService,
     private shortService: ShortsFeedService,
+    private countriesService: CountriesService,
     private title: Title,
     private meta: Meta
   ) {}
@@ -181,6 +184,10 @@ export class VideoWatchComponent implements OnInit, OnDestroy {
       this.videoService.getVideoBySlug(slug).subscribe({
         next: (video) => {
           this.video = video;
+          // compute country flag code (lowercase) for display
+          this.countryFlag = video.country
+            ? this.countriesService.getCountryByName(video.country)?.flagCode?.toLowerCase()
+            : undefined;
           this.loading = false;
           this.applySeo(video);
 

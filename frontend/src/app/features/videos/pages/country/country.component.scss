@@ -1,0 +1,31 @@
+.countries-page {
+  max-width: 1400px;
+  margin: auto;
+}
+
+.country-card {
+  cursor: pointer;
+  background: #121212;
+  border-radius: 12px;
+  padding: 16px 12px;
+  text-align: center;
+  transition: all 0.2s ease;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+
+  &:hover {
+    transform: translateY(-4px);
+    border-color: #ff4d4d;
+  }
+}
+
+.flag {
+  font-size: 36px;
+  margin-bottom: 8px;
+}
+
+.name {
+  font-size: 14px;
+  font-weight: 500;
+  color: #eaeaea;
+  line-height: 1.2;
+}

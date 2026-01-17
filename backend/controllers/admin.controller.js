@@ -47,7 +47,7 @@ exports.addVideo = async (req, res) => {
     // =========================
     // BASIC VALIDATION
     // =========================
-    if (!title || !storage_type || !thumbFile || !country) {
+    if (!title || !storage_type || !thumbFile) {
       return res.status(400).json({ error: "Missing required fields" });
     }
 
@@ -243,6 +243,7 @@ exports.updateVideo = async (req, res) => {
       title,
       description,
       category,
+      country,
       video_type,
       meta_title,
       meta_description,
@@ -282,18 +283,20 @@ exports.updateVideo = async (req, res) => {
         title = COALESCE($1, title),
         description = COALESCE($2, description),
         category = COALESCE($3, category),
-        video_type = COALESCE($4, video_type),
-        meta_title = COALESCE($5, meta_title),
-        meta_description = COALESCE($6, meta_description),
-        focus_keywords = COALESCE($7, focus_keywords),
-        thumbnail_url = $8,
+        country = COALESCE($4, country),
+        video_type = COALESCE($5, video_type),
+        meta_title = COALESCE($6, meta_title),
+        meta_description = COALESCE($7, meta_description),
+        focus_keywords = COALESCE($8, focus_keywords),
+        thumbnail_url = $9,
         updated_at = NOW()
-      WHERE id = $9
+      WHERE id = $10
       `,
       [
         title,
         description,
         category,
+        country,
         video_type,
         meta_title,
         meta_description,

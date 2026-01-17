@@ -4,6 +4,8 @@ import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { Video, VideoCategory } from '../../../videos/models/video.model';
 import { AdminVideoService } from '../../services/admin-video.service';
+import { CountriesService } from '../../../../shared/services/countries.service';
+import { Country } from '../../../../shared/models/countries.model';
 
 @Component({
   selector: 'app-edit-video',
@@ -18,11 +20,14 @@ export class EditVideoComponent implements OnInit {
   form!: FormGroup;
   loading = false;
   categories: VideoCategory[] = [];
+  countries: Country[] = [];
 
   constructor(
     private fb: FormBuilder,
     private adminService: AdminVideoService,
     public activeModal: NgbActiveModal
+    ,
+    private countriesService: CountriesService
   ) {}
 
   ngOnInit(): void {
@@ -52,6 +57,8 @@ export class EditVideoComponent implements OnInit {
         focusKeywords: this.video.focus_keywords?.join(', '),
       });
     }
+
+    this.countries = this.countriesService.getAllCountries();
   }
 
   // =========================

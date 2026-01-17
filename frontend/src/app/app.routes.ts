@@ -62,6 +62,13 @@ export const routes: Routes = [
           },
         ],
       },
+      {
+        path: 'countries',
+        loadComponent: () =>
+          import('./features/videos/pages/country/country.component').then(
+            (m) => m.CountriesComponent
+          ),
+      },
 
       /**
        * =========================
@@ -92,23 +99,23 @@ export const routes: Routes = [
       {
         path: 'contact-us',
         loadComponent: () =>
-          import('./features/support/components/contact-us/contact-us.component').then(
-            (m) => m.ContactUsComponent
-          ),
+          import(
+            './features/support/components/contact-us/contact-us.component'
+          ).then((m) => m.ContactUsComponent),
       },
       {
         path: 'content-removal-request',
         loadComponent: () =>
-          import('./features/support/components/content-removal/content-removal.component').then(
-            (m) => m.ContentRemovalComponent
-          ),
+          import(
+            './features/support/components/content-removal/content-removal.component'
+          ).then((m) => m.ContentRemovalComponent),
       },
       {
         path: 'privacy-policy',
         loadComponent: () =>
-          import('./features/support/pages/privacy-policy/privacy-policy.component').then(
-            (m) => m.PrivacyPolicyComponent
-          ),
+          import(
+            './features/support/pages/privacy-policy/privacy-policy.component'
+          ).then((m) => m.PrivacyPolicyComponent),
       },
       {
         path: 'about-us',

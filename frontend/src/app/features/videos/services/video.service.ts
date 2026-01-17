@@ -15,14 +15,17 @@ export class VideoService {
     limit?: number;
     q?: string;
     category?: string;
+    country?: string;
   }) {
     let httpParams = new HttpParams();
 
-    if (params.page) httpParams = httpParams.set('page', params.page);
-    if (params.limit) httpParams = httpParams.set('limit', params.limit);
+    if (params.page) httpParams = httpParams.set('page', String(params.page));
+    if (params.limit) httpParams = httpParams.set('limit', String(params.limit));
     if (params.q) httpParams = httpParams.set('q', params.q);
     if (params.category)
       httpParams = httpParams.set('category', params.category);
+    if (params.country)
+      httpParams = httpParams.set('country', params.country);
 
     return this.http.get<any>(`${environment.baseUrl}/videos`, {
       params: httpParams,
@@ -65,5 +68,4 @@ export class VideoService {
       )
     );
   }
-
 }

@@ -20,6 +20,7 @@ export class HomeComponent implements OnInit {
   // 🔎 filters
   query = '';
   category = '';
+  country = ''; // ✅ ADD THIS
 
   // 📄 pagination
   currentPage = 1;
@@ -36,6 +37,7 @@ export class HomeComponent implements OnInit {
     this.route.queryParams.subscribe((params) => {
       this.query = params['q'] || '';
       this.category = params['category'] || '';
+      this.country = params['country'] || ''; // ✅ ADD THIS
 
       // reset when filters change
       this.currentPage = 1;
@@ -52,6 +54,7 @@ export class HomeComponent implements OnInit {
         limit: this.limit,
         q: this.query || undefined,
         category: this.category || undefined,
+        country: this.country || undefined, // ✅ ADD THIS
       })
       .subscribe({
         next: (res) => {
