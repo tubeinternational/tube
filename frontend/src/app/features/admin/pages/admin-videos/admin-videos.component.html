@@ -12,6 +12,7 @@
         <th>Video</th>
         <th>Title</th>
         <th>Views</th>
+        <th>Category</th>
         <th>Video Type</th>
         <th>Uploaded</th>
         <th>Status</th>
@@ -33,6 +34,7 @@
 
         <td>{{ v.title }}</td>
         <td>{{ v.views }}</td>
+        <td>{{ v.category }}</td>
         <td>{{ v.video_type }}</td>
         <td>{{ v.created_at | date : "short" }}</td>
 

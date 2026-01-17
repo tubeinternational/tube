@@ -1,0 +1,164 @@
+<div class=" py-4">
+  <div class="my-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+
+      <!-- Page Title -->
+      <h1 class="mb-3 text-center">Contact Us</h1>
+      <p class="text-muted text-center mb-5">
+        Get in Touch With <strong>ExoLust</strong>
+      </p>
+
+      <!-- Intro -->
+      <section class="mb-5">
+        <p>
+          We value communication, transparency, and user feedback. Whether you’re
+          reaching out with a question, concern, business inquiry, or
+          content-related request, our team is here to help.
+        </p>
+
+        <p class="text-muted">
+          Please use the contact form above and select the appropriate subject to
+          ensure a faster response.
+        </p>
+      </section>
+
+      <!-- How to Contact -->
+      <section class="mb-5">
+        <h4>How to Contact Us</h4>
+
+        <p>
+          When sending a message, please clearly mention one of the following
+          subjects:
+        </p>
+
+        <div class="mt-4">
+
+          <!-- Suggestions -->
+          <div class="mb-4">
+            <h5>💡 Suggestions & Feedback</h5>
+            <p>
+              Have ideas to improve ExoLust? We’re always open to hearing from our users.
+            </p>
+          </div>
+
+          <!-- Technical Support -->
+          <div class="mb-4">
+            <h5>🛠 Technical Support</h5>
+            <p>If you’re experiencing technical issues, please include:</p>
+
+            <ul class="ps-3">
+              <li>Device type</li>
+              <li>Operating system</li>
+              <li>Browser used</li>
+              <li>Any extensions or blockers enabled</li>
+            </ul>
+
+            <p class="text-muted">
+              This helps us resolve issues faster.
+            </p>
+          </div>
+
+          <!-- DMCA Notice -->
+          <div class="mb-5">
+              <h5 class="mb-2">📩 Content Removal / DMCA</h5>
+
+              <p class="mb-2">
+                <strong>Important Notice Regarding Content Removal</strong>
+              </p>
+
+              <p>
+                If you are requesting the removal of any content due to copyright
+                concerns, privacy issues, or consent-related matters,
+                <strong>please do not use this contact form</strong>.
+              </p>
+
+              <p class="mb-2">
+                ➡️ All content removal and DMCA-related requests must be submitted
+                through our dedicated
+                <strong>Content Removal</strong> page to ensure faster and proper
+                processing.
+              </p>
+
+              <p class="mb-0 text-muted">
+                Requests sent via the general contact form for content removal
+                may not be reviewed or acted upon.
+              </p>
+          </div>
+
+          <!-- Content Requests -->
+          <div class="mb-4">
+            <h5>🎥 Content Requests</h5>
+            <p>
+              Looking for a specific type of content? You may submit a request,
+              and if it aligns with our policies, it may be considered.
+            </p>
+          </div>
+
+          <!-- Advertising -->
+          <div>
+            <h5>📢 Advertising & Business Inquiries</h5>
+            <p>
+              For partnerships or advertising inquiries, please include your
+              company name, contact details, and a proposal overview.
+            </p>
+          </div>
+
+        </div>
+      </section>
+
+    </div>
+  </div>
+</div>
+
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="shadow-sm">
+        <div class="card-body p-4">
+          <h5 class="mb-3">Contact Us</h5>
+
+          <form [formGroup]="form" (ngSubmit)="submit()">
+            <div class="mb-3">
+              <label class="form-label">Full Name</label>
+              <input
+                type="text"
+                class="form-control"
+                formControlName="fullName"
+              />
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Email</label>
+              <input
+                type="email"
+                class="form-control"
+                formControlName="email"
+              />
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Message</label>
+              <textarea
+                rows="4"
+                class="form-control"
+                formControlName="message"
+              ></textarea>
+            </div>
+
+            <div *ngIf="success" class="alert alert-success">
+              Message sent successfully
+            </div>
+
+            <button
+              class="btn btn-primary w-100"
+              type="submit"
+              [disabled]="loading"
+            >
+              {{ loading ? 'Sending...' : 'Submit' }}
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

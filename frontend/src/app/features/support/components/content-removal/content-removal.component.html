@@ -1,0 +1,204 @@
+<div class="py-4">
+  <div class="my-5">
+    <div class="row justify-content-center">
+      <div class="col-lg-10 col-xl-9">
+        <!-- Page Title -->
+        <h1 class="mb-4 text-center">Content Removal / DMCA</h1>
+
+        <!-- Intro -->
+        <section class="mb-5">
+            📩 <strong>Content Removal / DMCA</strong>
+
+          <p class="mt-3">
+            For copyright or content removal requests, please include the
+            following information to ensure timely processing:
+          </p>
+
+          <ul class="ps-3">
+            <li>Your full name</li>
+            <li>Valid email address</li>
+            <li>Proof of ownership or authorization</li>
+            <li>Exact URL(s) of the content in question</li>
+          </ul>
+
+          <p class="text-muted">
+            Incomplete requests may be delayed or ignored.
+          </p>
+        </section>
+
+        <!-- Content Requests -->
+        <section class="mb-5">
+            🎥 <strong>Content Requests</strong>
+
+          <p class="mt-3">
+            Looking for a specific type of content? You may submit a request,
+            and if it aligns with our policies, it may be considered.
+          </p>
+        </section>
+
+        <!-- Advertising -->
+        <section class="mb-5">
+            📢 <strong>Advertising & Business Inquiries</strong>
+
+          <p class="mt-3">
+            For partnerships or advertising inquiries, please include:
+          </p>
+
+          <ul class="ps-3">
+            <li>Company name</li>
+            <li>Contact details</li>
+            <li>Proposal overview</li>
+          </ul>
+        </section>
+
+        <!-- Important Notes -->
+        <section class="mb-5">
+          <h4>Important Notes</h4>
+
+          <ul class="ps-3">
+            <li>Please do not send multiple messages for the same issue</li>
+            <li>Responses are usually provided within 24–48 hours</li>
+            <li>
+              Requests containing false or misleading information may be ignored
+            </li>
+          </ul>
+        </section>
+
+        <!-- Policy -->
+        <section class="mb-5">
+          <h4>Content Removal / DMCA Policy</h4>
+          <h5 class="mt-3">Content Safety & Compliance</h5>
+
+          <p>
+            At ExoLust, user safety, consent, and legal compliance are top
+            priorities.
+          </p>
+
+          <p>We strictly prohibit:</p>
+
+          <ul class="ps-3">
+            <li>Child sexual abuse material (CSAM)</li>
+            <li>Non-consensual or exploitative content</li>
+            <li>Revenge content or blackmail</li>
+            <li>Content exposing private or personal information</li>
+            <li>Illegal or abusive material</li>
+          </ul>
+
+          <p>Any such content is removed immediately upon verification.</p>
+        </section>
+
+        <!-- Copyright -->
+        <section class="mb-5">
+          <h5>Copyright Notice</h5>
+
+          <p>
+            ExoLust operates as a content aggregation and discovery platform. We
+            do not host video files on our own servers.
+          </p>
+
+          <p>
+            In accordance with the Digital Millennium Copyright Act (DMCA), 17
+            U.S.C. § 512, ExoLust qualifies as a service provider and follows
+            DMCA Notice & Takedown procedures.
+          </p>
+
+          <p>We respond promptly to valid copyright complaints.</p>
+        </section>
+
+        <!-- How to Request -->
+        <section class="mb-5">
+          <h4>How to Request Content Removal</h4>
+
+          <p>To submit a valid removal request, please provide:</p>
+
+          <ul class="ps-3">
+            <li>The exact URL(s) of the content</li>
+            <li>A clear explanation of the issue</li>
+            <li>Proof of ownership, consent, or authority</li>
+            <li>Valid contact information</li>
+          </ul>
+
+          <p class="text-muted">
+            Requests that lack sufficient details may not be processed.
+          </p>
+        </section>
+
+        <!-- What Can Be Reported -->
+        <section class="mb-5">
+          <h4>What Can Be Reported</h4>
+
+          <p>You may submit a complaint for:</p>
+
+          <ul class="ps-3">
+            <li>Non-consensual content</li>
+            <li>Copyright infringement</li>
+            <li>Exposure of private or personal data</li>
+            <li>Harassment or abusive material</li>
+            <li>Content violating local or international laws</li>
+          </ul>
+
+          <p>All reports are handled confidentially and professionally.</p>
+        </section>
+
+        <!-- Warning -->
+        <section>
+            ⚠️ <strong>Important Notice</strong><br />
+            Submitting false, misleading, or repeated spam complaints may result
+            in access restrictions.
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <div class="row justify-content-center">
+    <div class="col-lg-9">
+      <div class="shadow-sm">
+        <div class="card-body p-4">
+          <h5 class="mb-3">Content Removal Request</h5>
+
+          <form [formGroup]="form" (ngSubmit)="submit()">
+            <div class="mb-3">
+              <label class="form-label">Full Name</label>
+              <input class="form-control" formControlName="fullName" />
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Email</label>
+              <input
+                type="email"
+                class="form-control"
+                formControlName="email"
+              />
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Reported Content URL</label>
+              <input class="form-control" formControlName="contentUrl" />
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Reason</label>
+              <textarea
+                rows="4"
+                class="form-control"
+                formControlName="reason"
+              ></textarea>
+            </div>
+
+            <div *ngIf="success" class="alert alert-success">
+              Request submitted successfully
+            </div>
+
+            <button
+              class="btn btn-danger w-100"
+              type="submit"
+              [disabled]="loading"
+            >
+              {{ loading ? "Submitting..." : "Submit Request" }}
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -79,9 +79,43 @@ export const routes: Routes = [
       {
         path: 'categories',
         loadComponent: () =>
-          import(
-            './features/videos/pages/category/category.component'
-          ).then((m) => m.CategoryComponent),
+          import('./features/videos/pages/category/category.component').then(
+            (m) => m.CategoryComponent
+          ),
+      },
+
+      /**
+       * =========================
+       * HELP DESK (SUPPORT)
+       * =========================
+       */
+      {
+        path: 'contact-us',
+        loadComponent: () =>
+          import('./features/support/components/contact-us/contact-us.component').then(
+            (m) => m.ContactUsComponent
+          ),
+      },
+      {
+        path: 'content-removal-request',
+        loadComponent: () =>
+          import('./features/support/components/content-removal/content-removal.component').then(
+            (m) => m.ContentRemovalComponent
+          ),
+      },
+      {
+        path: 'privacy-policy',
+        loadComponent: () =>
+          import('./features/support/pages/privacy-policy/privacy-policy.component').then(
+            (m) => m.PrivacyPolicyComponent
+          ),
+      },
+      {
+        path: 'about-us',
+        loadComponent: () =>
+          import('./features/support/pages/about-us/about-us.component').then(
+            (m) => m.AboutUsComponent
+          ),
       },
     ],
   },
