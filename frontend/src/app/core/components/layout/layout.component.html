@@ -141,15 +141,18 @@
 </aside>
 
 <div class="main-container" id="mainContainer" #mainContainer>
-  <router-outlet></router-outlet>
-  <footer class="footer position-relative">
-    <div class="footer-content card p-4">
-      <div class="d-flex flex-wrap align-items-center justify-content-center gap-4">
-        <a class="text-primary" routerLink="/about-us">About Us</a>
-        <a class="text-primary" routerLink="/contact-us">Contact Us</a>
-        <a class="text-primary" routerLink="/privacy-policy">Privacy Policy</a>
+  <div class="content">
+    <router-outlet></router-outlet>
+  </div>
+
+  <footer class="footer">
+    <div class="footer-content">
+      <div class="footer-links d-flex flex-wrap align-items-center justify-content-center gap-3">
+        <a class="link" routerLink="/about-us">About</a>
+        <a class="link" routerLink="/contact-us">Contact</a>
+        <a class="link" routerLink="/privacy-policy">Privacy</a>
       </div>
-      <div class="footer-copy text-center mt-3">&copy; 2024 HoeTube. All rights reserved.</div>
+      <div class="footer-copy">&copy; 2024 HoeTube. All rights reserved.</div>
     </div>
   </footer>
 </div>

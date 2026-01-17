@@ -105,10 +105,10 @@
           *ngIf="video.category || video.country"
         >
           <span class="category" *ngIf="video.category">
-            {{ video.category }}
+            <i class="fa-solid fa-list me-2"></i> {{ video.category }}
           </span>
           <span class="country" *ngIf="video.country">
-            <span *ngIf="countryFlag" class=" pe-2 fi fi-{{ countryFlag }}"></span>
+            <span *ngIf="countryFlag" class=" me-2 fi fi-{{ countryFlag }}"></span>
             {{ video.country | titlecase }}
           </span>
           <span class="country" *ngIf="!video.country">
