@@ -25,8 +25,6 @@ export const routes: Routes = [
     path: '',
     component: LayoutComponent,
     children: [
-      { path: '', redirectTo: 'home', pathMatch: 'full' },
-
       {
         path: '',
         loadComponent: () =>
@@ -134,6 +132,6 @@ export const routes: Routes = [
    */
   {
     path: '**',
-    redirectTo: 'home',
+    redirectTo: '',
   },
 ];

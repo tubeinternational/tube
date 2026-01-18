@@ -160,7 +160,7 @@ export class LayoutComponent implements AfterViewInit, OnDestroy {
     const q = this.searchTerm.trim();
     if (!q) return;
 
-    this.router.navigate(['/home'], {
+    this.router.navigate(['/'], {
       queryParams: { q },
       queryParamsHandling: 'merge',
     });

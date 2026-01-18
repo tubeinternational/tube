@@ -56,7 +56,7 @@ export class CategoryComponent implements OnInit {
   // CATEGORY CLICK → NAVIGATE
   // =========================
   openCategory(category: VideoCategory): void {
-    this.router.navigate(['/videos'], {
+    this.router.navigate(['/'], {
       queryParams: {
         category: category.name,
       },

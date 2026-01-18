@@ -24,7 +24,7 @@ export class CountriesComponent implements OnInit {
   }
 
   onCountrySelect(country: Country): void {
-    this.router.navigate(['/home'], {
+    this.router.navigate(['/'], {
       queryParams: { country: country.country }
     });
   }
