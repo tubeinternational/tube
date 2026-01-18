@@ -7,10 +7,12 @@ import {
   Renderer2,
 } from '@angular/core';
 import { RouterOutlet, RouterLinkWithHref, RouterLink } from '@angular/router';
-import { Router } from '@angular/router';
+import { Router, NavigationEnd } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../../auth/services/auth.service';
 import { CommonModule } from '@angular/common';
+import { filter } from 'rxjs/operators';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-layout',
@@ -39,6 +41,7 @@ export class LayoutComponent implements AfterViewInit, OnDestroy {
   searchTerm = '';
   userEmail: string | null = null;
   isAdmin = false;
+  private routerSub?: Subscription;
 
   private _desktopOpen = false;
   private _unlisteners: Array<() => void> = [];
@@ -46,7 +49,7 @@ export class LayoutComponent implements AfterViewInit, OnDestroy {
   constructor(
     private renderer: Renderer2,
     private router: Router,
-    private authService: AuthService
+    private authService: AuthService,
   ) {
     this.authService.user$.subscribe((user) => {
       this.userEmail = user?.email || null;
@@ -61,18 +64,18 @@ export class LayoutComponent implements AfterViewInit, OnDestroy {
   ngAfterViewInit(): void {
     this._unlisteners.push(
       this.renderer.listen(this.menuBtn.nativeElement, 'click', () =>
-        this.onMenuClick()
-      )
+        this.onMenuClick(),
+      ),
     );
 
     this._unlisteners.push(
       this.renderer.listen(this.overlay.nativeElement, 'click', () =>
-        this.closeAll()
-      )
+        this.closeAll(),
+      ),
     );
 
     this._unlisteners.push(
-      this.renderer.listen('window', 'resize', () => this.onResize())
+      this.renderer.listen('window', 'resize', () => this.onResize()),
     );
 
     this._unlisteners.push(
@@ -85,8 +88,21 @@ export class LayoutComponent implements AfterViewInit, OnDestroy {
         ) {
           this.searchBarOpen = false;
         }
-      })
+      }),
     );
+
+    this.routerSub = this.router.events
+      .pipe(filter((event) => event instanceof NavigationEnd))
+      .subscribe(() => {
+        const width = window.innerWidth;
+
+        if (width <= 1024) {
+          this.sidebar.nativeElement.classList.remove('active');
+          this.overlay.nativeElement.classList.remove('active');
+        }
+
+        this.searchBarOpen = false;
+      });
 
     this.onResize();
   }
@@ -136,6 +152,7 @@ export class LayoutComponent implements AfterViewInit, OnDestroy {
   ngOnDestroy(): void {
     this._unlisteners.forEach((un) => un());
     this._unlisteners = [];
+    this.routerSub?.unsubscribe();
   }
 
   // 🔍 SEARCH

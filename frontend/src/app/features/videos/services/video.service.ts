@@ -16,16 +16,18 @@ export class VideoService {
     q?: string;
     category?: string;
     country?: string;
+    sort?: 'latest' | 'trending' | 'views'; // ✅ ADD
   }) {
     let httpParams = new HttpParams();
 
     if (params.page) httpParams = httpParams.set('page', String(params.page));
-    if (params.limit) httpParams = httpParams.set('limit', String(params.limit));
+    if (params.limit)
+      httpParams = httpParams.set('limit', String(params.limit));
     if (params.q) httpParams = httpParams.set('q', params.q);
     if (params.category)
       httpParams = httpParams.set('category', params.category);
-    if (params.country)
-      httpParams = httpParams.set('country', params.country);
+    if (params.country) httpParams = httpParams.set('country', params.country);
+    if (params.sort) httpParams = httpParams.set('sort', params.sort);
 
     return this.http.get<any>(`${environment.baseUrl}/videos`, {
       params: httpParams,
@@ -37,7 +39,7 @@ export class VideoService {
       map((video) => ({
         ...video,
         views: Number(video.views) || 0,
-      }))
+      })),
     );
   }
 
@@ -46,7 +48,7 @@ export class VideoService {
       map((v) => ({
         ...v,
         views: Number(v.views) || 0,
-      }))
+      })),
     );
   }
 
@@ -54,7 +56,7 @@ export class VideoService {
     return this.http.post(
       `${this.API_URL}/${id}/view`,
       {},
-      { withCredentials: true } // ✅ REQUIRED
+      { withCredentials: true }, // ✅ REQUIRED
     );
   }
 
@@ -64,8 +66,8 @@ export class VideoService {
         videos.map((v) => ({
           ...v,
           views: Number(v.views) || 0,
-        }))
-      )
+        })),
+      ),
     );
   }
 }

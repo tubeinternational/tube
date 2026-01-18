@@ -15,7 +15,8 @@ exports.getVideos = async (req, res) => {
 
     const q = req.query.q?.trim();
     const category = req.query.category?.trim();
-    const country = req.query.country?.trim(); // ✅ ADD THIS
+    const country = req.query.country?.trim();
+    const sort = req.query.sort?.trim(); // ✅ NEW
 
     const params = [];
     let whereSql = `
@@ -44,6 +45,13 @@ exports.getVideos = async (req, res) => {
       whereSql += ` AND country ILIKE $${params.length}`;
     }
 
+    // ✅ SORT LOGIC
+    let orderBySql = `ORDER BY created_at DESC`; // default
+
+    if (sort === "views" || sort === "trending") {
+      orderBySql = `ORDER BY views DESC, created_at DESC`;
+    }
+
     params.push(limit, offset);
 
     const { rows } = await db.query(
@@ -61,10 +69,11 @@ exports.getVideos = async (req, res) => {
         created_at
       FROM videos
       ${whereSql}
-      ORDER BY created_at DESC
-      LIMIT $${params.length - 1} OFFSET $${params.length}
+      ${orderBySql}
+      LIMIT $${params.length - 1}
+      OFFSET $${params.length}
       `,
-      params
+      params,
     );
 
     res.json({
@@ -138,7 +147,7 @@ exports.getVideoBySlug = async (req, res) => {
         v.category, v.country, v.created_at
       LIMIT 1
       `,
-      [slug, req.user?.id || null, guestHash]
+      [slug, req.user?.id || null, guestHash],
     );
 
     if (!rows.length) {
@@ -177,7 +186,7 @@ exports.incrementViews = async (req, res) => {
       WHERE id = $1
         AND is_active = true
       `,
-      [id]
+      [id],
     );
 
     res.json({ success: true });
@@ -216,7 +225,7 @@ exports.getRelatedVideos = async (req, res) => {
       ORDER BY created_at DESC
       LIMIT 6
       `,
-      [id]
+      [id],
     );
 
     res.json(
@@ -225,7 +234,7 @@ exports.getRelatedVideos = async (req, res) => {
         thumbnail_url: absoluteUrl(v.thumbnail_url, req),
         stream_url:
           v.storage_type === "local" ? `/api/stream/${v.id}` : v.video_url,
-      }))
+      })),
     );
   } catch (err) {
     console.error("Related videos error:", err);
@@ -281,7 +290,7 @@ exports.getShorts = async (req, res) => {
       ORDER BY v.created_at DESC
       LIMIT $1 OFFSET $2
       `,
-      [limit, offset, req.user?.id || null, guestHash]
+      [limit, offset, req.user?.id || null, guestHash],
     );
 
     res.json({
@@ -347,7 +356,7 @@ exports.getShortBySlug = async (req, res) => {
         v.duration, v.views, v.created_at
       LIMIT 1
       `,
-      [slug, req.user?.id || null, guestHash]
+      [slug, req.user?.id || null, guestHash],
     );
 
     if (!rows.length) {
@@ -406,12 +415,12 @@ exports.likeVideo = async (req, res) => {
       VALUES ($1, $2, $3)
       ON CONFLICT DO NOTHING
       `,
-      [videoId, userId, guestHash]
+      [videoId, userId, guestHash],
     );
 
     const { rows } = await db.query(
       `SELECT COUNT(*)::int AS likes_count FROM video_likes WHERE video_id = $1`,
-      [videoId]
+      [videoId],
     );
 
     res.json({

@@ -28,7 +28,7 @@ export const routes: Routes = [
       { path: '', redirectTo: 'home', pathMatch: 'full' },
 
       {
-        path: 'home',
+        path: '',
         loadComponent: () =>
           import('./features/videos/pages/home/home.component').then(
             (m) => m.HomeComponent

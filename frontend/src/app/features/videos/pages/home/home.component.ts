@@ -21,6 +21,7 @@ export class HomeComponent implements OnInit {
   query = '';
   category = '';
   country = ''; // ✅ ADD THIS
+  sort: 'latest' | 'trending' | 'views' = 'latest';
 
   // 📄 pagination
   currentPage = 1;
@@ -30,7 +31,7 @@ export class HomeComponent implements OnInit {
 
   constructor(
     private videoService: VideoService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
   ) {}
 
   ngOnInit(): void {
@@ -38,6 +39,7 @@ export class HomeComponent implements OnInit {
       this.query = params['q'] || '';
       this.category = params['category'] || '';
       this.country = params['country'] || ''; // ✅ ADD THIS
+      this.sort = params['sort'] || 'latest';
 
       // reset when filters change
       this.currentPage = 1;
@@ -54,7 +56,8 @@ export class HomeComponent implements OnInit {
         limit: this.limit,
         q: this.query || undefined,
         category: this.category || undefined,
-        country: this.country || undefined, // ✅ ADD THIS
+        country: this.country || undefined,
+        sort: this.sort !== 'latest' ? this.sort : undefined, // ✅ ADD
       })
       .subscribe({
         next: (res) => {
