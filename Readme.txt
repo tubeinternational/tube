@@ -1,28 +1,28 @@
 🐳 Docker Usage Guide
-🔹 Run Docker in Development Mode (Hot Reload)
+🔹 Development Mode (Hot Reload)
 
-Use this when actively developing.
-Backend & frontend reload automatically on file changes.
+Use this while actively developing.
+Backend & frontend auto-reload on file changes.
 
 docker compose -f docker-compose.dev.yml up
 
 
-Access:
+Access
 
-Frontend: http://localhost:4200
+Frontend: http://localhost:8080
 
 Backend API: http://localhost:5000
 
-🔹 Run Docker in Production Mode
+🔹 Production Mode
 
 Use this for production or production-like testing.
 
-docker compose up --build
+docker compose up --build -d
 
 
-Notes:
+Notes
 
-Uses built frontend build + Nginx
+Uses production frontend build + Nginx
 
 No hot reload
 
@@ -30,10 +30,24 @@ Persistent database & uploads via Docker volumes
 
 🔹 Run Database Migrations (Safe for Production)
 
-Use this to apply schema changes without deleting data.
+Apply schema changes without deleting data.
 
-docker exec -it tube-postgres psql -U postgres tube
+⚠️ Run this whenever new migration files are added.
 
-COMPLETELY REFRESH THE APP 
+docker compose run --rm backend npm run migrate
 
-docker compose up --build --force-recreate
+
+✔ Runs inside Docker network
+✔ Uses correct DATABASE_URL
+✔ Applies only pending migrations
+
+🔹 Restart / Rebuild Containers (No Data Loss)
+
+Use when you change Dockerfiles or configs.
+
+docker compose up --build --force-recreate -d
+
+✅ Recommended Production Flow
+docker compose up --build -d
+docker compose run --rm backend npm run migrate
+

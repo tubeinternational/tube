@@ -12,7 +12,7 @@ export const routes: Routes = [
     path: 'sign-in',
     loadComponent: () =>
       import('./auth/components/login/login.component').then(
-        (m) => m.LoginComponent
+        (m) => m.LoginComponent,
       ),
   },
 
@@ -29,16 +29,16 @@ export const routes: Routes = [
         path: '',
         loadComponent: () =>
           import('./features/videos/pages/home/home.component').then(
-            (m) => m.HomeComponent
+            (m) => m.HomeComponent,
           ),
       },
 
       {
         path: 'video/:slug',
         loadComponent: () =>
-          import(
-            './features/videos/pages/video-watch/video-watch.component'
-          ).then((m) => m.VideoWatchComponent),
+          import('./features/videos/pages/video-watch/video-watch.component').then(
+            (m) => m.VideoWatchComponent,
+          ),
       },
 
       {
@@ -47,16 +47,16 @@ export const routes: Routes = [
           {
             path: '',
             loadComponent: () =>
-              import(
-                './features/shorts/pages/shorts-feed/shorts-feed.component'
-              ).then((m) => m.ShortsFeedComponent),
+              import('./features/shorts/pages/shorts-feed/shorts-feed.component').then(
+                (m) => m.ShortsFeedComponent,
+              ),
           },
           {
             path: ':slug',
             loadComponent: () =>
-              import(
-                './features/shorts/pages/shorts-feed/shorts-feed.component'
-              ).then((m) => m.ShortsFeedComponent),
+              import('./features/shorts/pages/shorts-feed/shorts-feed.component').then(
+                (m) => m.ShortsFeedComponent,
+              ),
           },
         ],
       },
@@ -64,7 +64,7 @@ export const routes: Routes = [
         path: 'countries',
         loadComponent: () =>
           import('./features/videos/pages/country/country.component').then(
-            (m) => m.CountriesComponent
+            (m) => m.CountriesComponent,
           ),
       },
 
@@ -77,15 +77,30 @@ export const routes: Routes = [
         path: 'content-dashboard-admin',
         canActivate: [AuthGuard],
         loadComponent: () =>
-          import(
-            './features/admin/pages/admin-videos/admin-videos.component'
-          ).then((m) => m.AdminVideosComponent),
+          import('./features/admin/pages/admin-videos/admin-videos.component').then(
+            (m) => m.AdminVideosComponent,
+          ),
       },
       {
         path: 'categories',
         loadComponent: () =>
           import('./features/videos/pages/category/category.component').then(
-            (m) => m.CategoryComponent
+            (m) => m.CategoryComponent,
+          ),
+      },
+
+      /**
+       * =========================
+       * REQUESTS
+       * =========================
+       */
+
+      {
+        path: 'requests',
+        canActivate: [AuthGuard],
+        loadComponent: () =>
+          import('./features/admin/pages/requests-home/requests-home.component').then(
+            (m) => m.RequestsHomeComponent,
           ),
       },
 
@@ -97,29 +112,29 @@ export const routes: Routes = [
       {
         path: 'contact-us',
         loadComponent: () =>
-          import(
-            './features/support/components/contact-us/contact-us.component'
-          ).then((m) => m.ContactUsComponent),
+          import('./features/support/components/contact-us/contact-us.component').then(
+            (m) => m.ContactUsComponent,
+          ),
       },
       {
         path: 'content-removal-request',
         loadComponent: () =>
-          import(
-            './features/support/components/content-removal/content-removal.component'
-          ).then((m) => m.ContentRemovalComponent),
+          import('./features/support/components/content-removal/content-removal.component').then(
+            (m) => m.ContentRemovalComponent,
+          ),
       },
       {
         path: 'privacy-policy',
         loadComponent: () =>
-          import(
-            './features/support/pages/privacy-policy/privacy-policy.component'
-          ).then((m) => m.PrivacyPolicyComponent),
+          import('./features/support/pages/privacy-policy/privacy-policy.component').then(
+            (m) => m.PrivacyPolicyComponent,
+          ),
       },
       {
         path: 'about-us',
         loadComponent: () =>
           import('./features/support/pages/about-us/about-us.component').then(
-            (m) => m.AboutUsComponent
+            (m) => m.AboutUsComponent,
           ),
       },
     ],

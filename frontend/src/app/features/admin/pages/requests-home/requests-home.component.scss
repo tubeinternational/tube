@@ -1,0 +1,23 @@
+.admin-requests {
+  padding: 20px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 30px;
+}
+
+th, td {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+
+.resolved {
+  color: green;
+  font-weight: 600;
+}
+
+button {
+  cursor: pointer;
+}

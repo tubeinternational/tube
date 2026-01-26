@@ -1,0 +1,95 @@
+<h2>Support Requests</h2>
+
+@if (loading) {
+  <p>Loading...</p>
+}
+
+<div class="card">
+  <div class="card-header">
+    <h3 class="card-title mb-0">Contact Requests</h3>
+  </div>
+  <div class="card-body">
+    <div class="table-responsive">
+      <table class="table">
+        <tr>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Message</th>
+          <th>Date</th>
+        </tr>
+
+        @for (r of contactRequests; track r.id) {
+          <tr>
+            <td>{{ r.full_name }}</td>
+            <td>{{ r.email }}</td>
+            <td>{{ r.message }}</td>
+            <td>{{ r.created_at | date: "short" }}</td>
+          </tr>
+        }
+      </table>
+    </div>
+  </div>
+  <div class="card-footer">
+    <button
+      class="btn btn-sm btn-primary"
+      (click)="prevContacts()"
+      [disabled]="contactPage === 1"
+    >
+      Prev
+    </button>
+    <span class="mx-2">Page {{ contactPage }}</span>
+    <button class="btn btn-sm btn-primary" (click)="nextContacts()">
+      Next
+    </button>
+  </div>
+</div>
+
+<hr />
+
+<div class="card">
+  <div class="card-header">
+    <h3 class="card-title mb-0">Content Removal Requests</h3>
+  </div>
+  <div class="card-body">
+    <div class="table-responsive">
+      <table class="table">
+        <tr>
+          <th>Name</th>
+          <th>Email</th>
+          <th>URL</th>
+          <th>Reason</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+
+        @for (r of contentRequests; track r.id) {
+          <tr>
+            <td>{{ r.full_name }}</td>
+            <td>{{ r.email }}</td>
+            <td><a [href]="r.content_url" target="_blank">View</a></td>
+            <td>{{ r.reason }}</td>
+            <td>{{ r.status }}</td>
+            <td>
+              @if (r.status === "open") {
+                <button class="btn btn-sm btn-primary" (click)="resolve(r.id)">Resolve</button>
+              } @else {
+                <span class="resolved">Resolved</span>
+              }
+            </td>
+          </tr>
+        }
+      </table>
+    </div>
+  </div>
+  <div class="card-footer">
+    <button
+      class="btn btn-sm btn-primary"
+      (click)="prevContent()"
+      [disabled]="contentPage === 1"
+    >
+      Prev
+    </button>
+    <span class="mx-2">Page {{ contentPage }}</span>
+    <button class="btn btn-sm btn-primary" (click)="nextContent()">Next</button>
+  </div>
+</div>
