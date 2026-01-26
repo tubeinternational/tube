@@ -83,9 +83,13 @@
         ><i class="fas fa-fire"></i> Trending
       </a>
     </li>
-    <li>
-      <a class="nav-link" routerLink="/shorts"><i class="fas fa-fire"></i> Shorts </a>
-    </li>
+    @if (isAdmin) {
+      <li>
+        <a class="nav-link" routerLink="/shorts"
+          ><i class="fas fa-fire"></i> Shorts
+        </a>
+      </li>
+    }
   </ul>
 
   <hr style="border-color: var(--border); margin: 10px 0" />
