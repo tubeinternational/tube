@@ -79,7 +79,9 @@
       >
     </li>
     <li>
-      <a class="nav-link" routerLink="/" [queryParams]="{ sort: 'trending' }"><i class="fas fa-fire"></i> Trending </a>
+      <a class="nav-link" routerLink="/" [queryParams]="{ sort: 'trending' }"
+        ><i class="fas fa-fire"></i> Trending
+      </a>
     </li>
   </ul>
 
@@ -121,13 +123,12 @@
   </button>
 
   <div class="dropdown-content" [class.show-dropdown]="isDropdownOpen('pages')">
+    <a class="dropdown-item" routerLink="/about-us"> About Us </a>
+    <a class="dropdown-item" routerLink="/privacy-policy"> Privacy Policy </a>
     <a class="dropdown-item" routerLink="/contact-us"> Contact Us </a>
-
     <a class="dropdown-item" routerLink="/content-removal-request">
       Content Removal Request
     </a>
-    <a class="dropdown-item" routerLink="/privacy-policy"> Privacy Policy </a>
-    <a class="dropdown-item" routerLink="/about-us"> About Us </a>
   </div>
 
   <hr style="border-color: var(--border); margin: 10px 0" />
@@ -146,16 +147,37 @@
     <router-outlet></router-outlet>
   </div>
 
-  <footer class="footer">
-    <div class="footer-content">
+  <footer class="footer" *ngIf="!hideFooter">
+    <div class="footer-content text-center">
+      <!-- SEO / Descriptive Footer Content -->
+      <div class="footer-seo mb-2 px-3">
+        <h4 class="footer-title mb-2">
+          ExoLust: Exotic Forbidden Porn – Veiled Hijab Drops, Repressed Asian
+          Sirens, Hidden White Taboo, Leaked Censored Clips & Dripping Hardcore
+          XXX
+        </h4>
+
+        <p class="footer-description mb-0 text-muted">
+          Dive into ExoLust's exotic forbidden world: veiled Hijabi Arab
+          temptresses, Korean secret wetness, Chinese hidden sluts, Indonesian
+          taboo vixens, Latina repressed fire, African strict goddesses,
+          European hidden kink, squirting taboo sluts, cock-hungry vixens,
+          leaked hidden cams, homemade uncensored fucks—24/7 fresh, fast HD, raw
+          pleasure from the strictest corners.
+        </p>
+      </div>
+
+      <!-- Footer Links -->
       <div
-        class="footer-links d-flex flex-wrap align-items-center justify-content-center gap-3"
+        class="footer-links d-flex flex-wrap align-items-center justify-content-center gap-3 mb-2"
       >
         <a class="link" routerLink="/about-us">About</a>
         <a class="link" routerLink="/contact-us">Contact</a>
         <a class="link" routerLink="/privacy-policy">Privacy</a>
       </div>
-      <div class="footer-copy">&copy; 2024 HoeTube. All rights reserved.</div>
+
+      <!-- Copyright -->
+      <div class="footer-copy">&copy; 2026 EXOLUST. All rights reserved.</div>
     </div>
   </footer>
 </div>

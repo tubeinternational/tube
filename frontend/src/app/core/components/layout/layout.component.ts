@@ -45,6 +45,7 @@ export class LayoutComponent implements AfterViewInit, OnDestroy {
 
   private _desktopOpen = false;
   private _unlisteners: Array<() => void> = [];
+  hideFooter = false;
 
   constructor(
     private renderer: Renderer2,
@@ -55,6 +56,11 @@ export class LayoutComponent implements AfterViewInit, OnDestroy {
       this.userEmail = user?.email || null;
       this.isAdmin = user?.role === 'ADMIN';
     });
+    this.router.events
+      .pipe(filter((event) => event instanceof NavigationEnd))
+      .subscribe((event: NavigationEnd) => {
+        this.hideFooter = event.urlAfterRedirects.startsWith('/shorts');
+      });
   }
 
   logout() {

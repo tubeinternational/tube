@@ -5,6 +5,8 @@ import { VideoCardComponent } from '../../components/video-card/video-card.compo
 import { Video } from '../../models/video.model';
 import { VideoService } from '../../services/video.service';
 import { buildPaginationPages } from '../../../../shared/utils/pagination.utils';
+import { DEFAULT_SEO } from '../../../../core/seo/default.seo';
+import { Meta, Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-home',
@@ -32,9 +34,23 @@ export class HomeComponent implements OnInit {
   constructor(
     private videoService: VideoService,
     private route: ActivatedRoute,
+    private title: Title,
+    private meta: Meta,
   ) {}
 
   ngOnInit(): void {
+    this.title.setTitle(DEFAULT_SEO.title);
+
+    this.meta.updateTag({
+      name: 'description',
+      content: DEFAULT_SEO.description,
+    });
+
+    this.meta.updateTag({
+      name: 'keywords',
+      content: DEFAULT_SEO.keywords,
+    });
+
     this.route.queryParams.subscribe((params) => {
       this.query = params['q'] || '';
       this.category = params['category'] || '';
