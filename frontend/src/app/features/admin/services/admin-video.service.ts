@@ -37,9 +37,16 @@ export class AdminVideoService {
    * =========================
    * GET /api/admin/videos
    */
-  getVideos(page = 1, limit = 25, q?: string): Observable<PaginatedVideos> {
+  getVideos(page = 1, limit = 25, q?: string, category?: string | null) {
     const params: any = { page, limit };
-    if (q) params.q = q;
+
+    if (q && q.trim()) {
+      params.q = q.trim();
+    }
+
+    if (category && category !== 'undefined') {
+      params.category = category;
+    }
 
     return this.http
       .get<PaginatedVideos>(`${this.baseUrl}/videos`, { params })
@@ -50,7 +57,7 @@ export class AdminVideoService {
             ...v,
             views: Number(v.views) || 0,
           })),
-        }))
+        })),
       );
   }
 
@@ -72,7 +79,7 @@ export class AdminVideoService {
    */
   updateVideo(
     id: string,
-    data: Partial<Pick<Video, 'title' | 'description' | 'category'>>
+    data: Partial<Pick<Video, 'title' | 'description' | 'category'>>,
   ): Observable<any> {
     return this.http.put(`${this.baseUrl}/video/${id}`, data);
   }

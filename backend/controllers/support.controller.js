@@ -1,85 +1,163 @@
-const { sendEmail } = require("../utils/supportMail");
+const pool = require("../db");
 
 /**
  * POST /api/support/contact
+ * Public
  */
 exports.contactUs = async (req, res) => {
-  try {
-    const { fullName, email, message } = req.body;
+  const { fullName, email, message } = req.body;
 
-    if (!fullName || !email || !message) {
-      return res.status(400).json({
-        success: false,
-        message: "All fields are required",
-      });
-    }
-
-    await sendEmail({
-      to: process.env.SUPPORT_EMAIL,
-      replyTo: email,
-      subject: `Contact Us – ${fullName}`,
-      html: `
-        <h2>New Contact Us Message</h2>
-        <p><strong>Name:</strong> ${fullName}</p>
-        <p><strong>Email:</strong> ${email}</p>
-        <p><strong>Message:</strong></p>
-        <p>${message}</p>
-      `,
-    });
-
-    return res.status(200).json({
-      success: true,
-      message: "Message sent successfully",
-    });
-  } catch (error) {
-    console.error("Contact Us error:", error);
-
-    return res.status(500).json({
+  if (!fullName || !email || !message) {
+    return res.status(400).json({
       success: false,
-      message: "Failed to send message",
+      message: "All fields are required",
+    });
+  }
+
+  try {
+    await pool.query(
+      `
+      INSERT INTO contact_requests (full_name, email, message)
+      VALUES ($1, $2, $3)
+      `,
+      [fullName, email, message]
+    );
+
+    res.json({
+      success: true,
+      message: "Your message has been received",
+    });
+  } catch (err) {
+    console.error("Contact request error:", err);
+    res.status(500).json({
+      success: false,
+      message: "Failed to submit message",
     });
   }
 };
 
 /**
  * POST /api/support/content-removal
+ * Public
  */
 exports.contentRemovalRequest = async (req, res) => {
-  try {
-    const { fullName, email, contentUrl, reason } = req.body;
+  const { fullName, email, contentUrl, reason } = req.body;
 
-    if (!fullName || !email || !contentUrl || !reason) {
-      return res.status(400).json({
-        success: false,
-        message: "All fields are required",
-      });
-    }
-
-    await sendEmail({
-      to: process.env.SUPPORT_EMAIL,
-      replyTo: email,
-      subject: "Content Removal Request",
-      html: `
-        <h2>Content Removal Request</h2>
-        <p><strong>Name:</strong> ${fullName}</p>
-        <p><strong>Email:</strong> ${email}</p>
-        <p><strong>Reported Content URL:</strong></p>
-        <p>${contentUrl}</p>
-        <p><strong>Reason:</strong></p>
-        <p>${reason}</p>
-      `,
-    });
-
-    return res.status(200).json({
-      success: true,
-      message: "Content removal request submitted",
-    });
-  } catch (error) {
-    console.error("Content removal error:", error);
-
-    return res.status(500).json({
+  if (!fullName || !email || !contentUrl || !reason) {
+    return res.status(400).json({
       success: false,
-      message: "Failed to submit content removal request",
+      message: "All fields are required",
     });
   }
+
+  try {
+    await pool.query(
+      `
+      INSERT INTO content_removal_requests
+      (full_name, email, content_url, reason)
+      VALUES ($1, $2, $3, $4)
+      `,
+      [fullName, email, contentUrl, reason]
+    );
+
+    res.json({
+      success: true,
+      message: "Content removal request received",
+    });
+  } catch (err) {
+    console.error("Content removal error:", err);
+    res.status(500).json({
+      success: false,
+      message: "Failed to submit request",
+    });
+  }
+};
+
+/**
+ * GET /api/support/admin/contact-requests
+ * Admin (paginated)
+ */
+exports.getContactRequests = async (req, res) => {
+  try {
+    const page = Number(req.query.page || 1);
+    const limit = Number(req.query.limit || 10);
+    const offset = (page - 1) * limit;
+
+    const [data, count] = await Promise.all([
+      pool.query(
+        `SELECT * FROM contact_requests
+         ORDER BY created_at DESC
+         LIMIT $1 OFFSET $2`,
+        [limit, offset]
+      ),
+      pool.query(`SELECT COUNT(*) FROM contact_requests`)
+    ]);
+
+    res.json({
+      success: true,
+      data: data.rows,
+      pagination: {
+        page,
+        limit,
+        total: Number(count.rows[0].count),
+      },
+    });
+  } catch (err) {
+    console.error("Get contact requests error:", err);
+    res.status(500).json({ success: false });
+  }
+};
+
+/**
+ * GET /api/support/admin/content-removal-requests
+ * Admin (paginated)
+ */
+exports.getContentRemovalRequests = async (req, res) => {
+  try {
+    const page = Number(req.query.page || 1);
+    const limit = Number(req.query.limit || 10);
+    const offset = (page - 1) * limit;
+
+    const [data, count] = await Promise.all([
+      pool.query(
+        `SELECT * FROM content_removal_requests
+         ORDER BY created_at DESC
+         LIMIT $1 OFFSET $2`,
+        [limit, offset]
+      ),
+      pool.query(`SELECT COUNT(*) FROM content_removal_requests`)
+    ]);
+
+    res.json({
+      success: true,
+      data: data.rows,
+      pagination: {
+        page,
+        limit,
+        total: Number(count.rows[0].count),
+      },
+    });
+  } catch (err) {
+    console.error("Get content removal requests error:", err);
+    res.status(500).json({ success: false });
+  }
+};
+
+/**
+ * PATCH /api/support/admin/content-removal-requests/:id/status
+ */
+exports.updateContentRemovalStatus = async (req, res) => {
+  const { id } = req.params;
+  const { status } = req.body;
+
+  if (!["open", "resolved"].includes(status)) {
+    return res.status(400).json({ success: false });
+  }
+
+  await pool.query(
+    `UPDATE content_removal_requests SET status=$1 WHERE id=$2`,
+    [status, id]
+  );
+
+  res.json({ success: true });
 };

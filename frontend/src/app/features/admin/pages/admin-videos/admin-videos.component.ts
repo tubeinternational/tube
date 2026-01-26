@@ -1,23 +1,27 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NgbModal, NgbModule } from '@ng-bootstrap/ng-bootstrap';
-import { Video } from '../../../videos/models/video.model';
+import { RouterLink } from '@angular/router';
+import { FormsModule } from '@angular/forms';
+
+import { Video, VideoCategory } from '../../../videos/models/video.model';
 import { AdminVideoService } from '../../services/admin-video.service';
 import { AddVideoComponent } from '../../components/add-video/add-video.component';
 import { EditVideoComponent } from '../../components/edit-video/edit-video.component';
 import { ConfirmModalComponent } from '../../../../shared/components/confirm-modal/confirm-modal.component';
-import { RouterLink } from '@angular/router';
 import { buildPaginationPages } from '../../../../shared/utils/pagination.utils';
 
 @Component({
   selector: 'app-admin-videos',
   standalone: true,
-  imports: [CommonModule, NgbModule, RouterLink],
+  imports: [CommonModule, NgbModule, RouterLink, FormsModule],
   templateUrl: './admin-videos.component.html',
   styleUrls: ['./admin-videos.component.scss'],
 })
 export class AdminVideosComponent implements OnInit {
   videos: Video[] = [];
+  categories: VideoCategory[] = [];
+
   loading = false;
 
   currentPage = 1;
@@ -25,36 +29,83 @@ export class AdminVideosComponent implements OnInit {
   totalPages = 0;
   total = 0;
 
+  // 🔍 SEARCH / FILTER STATE
+  searchQuery = '';
+  selectedCategory = '';
+
   constructor(
     private adminService: AdminVideoService,
-    private modal: NgbModal
+    private modal: NgbModal,
   ) {}
 
   ngOnInit(): void {
     this.fetchVideos(1);
+    this.loadCategories();
   }
 
+  // =========================
+  // FETCH VIDEOS
+  // =========================
   fetchVideos(page = 1): void {
     this.loading = true;
 
-    this.adminService.getVideos(page, this.limit).subscribe({
-      next: (res) => {
-        this.videos = res.results;
-        this.currentPage = res.page;
-        this.totalPages = res.totalPages;
-        this.total = res.total;
-        this.loading = false;
-      },
-      error: () => (this.loading = false),
+    this.adminService
+      .getVideos(
+        page,
+        this.limit,
+        this.searchQuery?.trim() || undefined,
+        this.selectedCategory ?? undefined,
+      )
+      .subscribe({
+        next: (res) => {
+          this.videos = res.results;
+          this.currentPage = res.page;
+          this.totalPages = res.totalPages;
+          this.total = res.total;
+          this.loading = false;
+        },
+        error: () => (this.loading = false),
+      });
+  }
+
+  // =========================
+  // LOAD CATEGORIES
+  // =========================
+  loadCategories(): void {
+    this.adminService.getCategories().subscribe({
+      next: (cats) => (this.categories = cats),
     });
   }
 
+  // =========================
+  // SEARCH HANDLER
+  // =========================
+  onSearch(): void {
+    this.fetchVideos(1);
+  }
+
+  clearFilters(): void {
+    this.searchQuery = '';
+    this.selectedCategory = '';
+    this.fetchVideos(1);
+  }
+
+  // =========================
+  // UI HELPERS
+  // =========================
   getViewRoute(video: Video): any[] {
     return video.video_type === 'short'
       ? ['/shorts', video.slug]
       : ['/video', video.slug];
   }
 
+  get pages(): number[] {
+    return buildPaginationPages(this.currentPage, this.totalPages, 2);
+  }
+
+  // =========================
+  // MODALS & ACTIONS
+  // =========================
   openAddModal(): void {
     const ref = this.modal.open(AddVideoComponent, {
       size: 'lg',
@@ -62,7 +113,7 @@ export class AdminVideosComponent implements OnInit {
     });
 
     ref.closed.subscribe((result) => {
-      if (result) this.fetchVideos();
+      if (result) this.fetchVideos(this.currentPage);
     });
   }
 
@@ -75,7 +126,7 @@ export class AdminVideosComponent implements OnInit {
     ref.componentInstance.video = video;
 
     ref.closed.subscribe((result) => {
-      if (result) this.fetchVideos();
+      if (result) this.fetchVideos(this.currentPage);
     });
   }
 
@@ -97,18 +148,14 @@ export class AdminVideosComponent implements OnInit {
       if (!confirmed) return;
 
       this.adminService.deleteVideo(video.id).subscribe(() => {
-        this.fetchVideos();
+        this.fetchVideos(this.currentPage);
       });
     });
   }
 
   toggleVideo(video: Video): void {
     this.adminService.toggleVideo(video.id).subscribe(() => {
-      this.fetchVideos();
+      this.fetchVideos(this.currentPage);
     });
-  }
-
-  get pages(): number[] {
-    return buildPaginationPages(this.currentPage, this.totalPages, 2);
   }
 }

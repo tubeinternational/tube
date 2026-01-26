@@ -105,7 +105,7 @@ exports.addVideo = async (req, res) => {
           meta_title || title, // $9
           meta_description || description, // $10
           keywordsArray, // $11
-        ]
+        ],
       );
     }
 
@@ -151,7 +151,7 @@ exports.addVideo = async (req, res) => {
           meta_title || title, // $9
           meta_description || description, // $10
           keywordsArray, // $11
-        ]
+        ],
       );
     }
 
@@ -172,20 +172,49 @@ exports.addVideo = async (req, res) => {
 exports.listVideos = async (req, res) => {
   try {
     const page = Math.max(+req.query.page || 1, 1);
-    const limit = Math.min(+req.query.limit || 20, 50);
+    const limit = Math.min(+req.query.limit || 25, 50);
     const offset = (page - 1) * limit;
-    const q = req.query.q?.trim();
+
+    let q = req.query.q?.trim();
+    const category = req.query.category?.trim();
 
     const params = [];
     let where = `WHERE 1=1`;
 
+    // 🔍 SEARCH: title, slug, video_url
     if (q) {
+      // If user pasted full URL → extract slug
+      try {
+        const url = new URL(q);
+        const parts = url.pathname.split("/");
+        q = parts[parts.length - 1] || q;
+      } catch (_) {
+        // not a URL, ignore
+      }
+
       params.push(`%${q}%`);
-      where += ` AND title ILIKE $1`;
+      where += `
+        AND (
+          title ILIKE $${params.length}
+          OR slug ILIKE $${params.length}
+          OR video_url ILIKE $${params.length}
+        )
+      `;
     }
 
-    params.push(limit, offset);
+    // 🏷 CATEGORY FILTER (slug OR name)
+    if (category) {
+      params.push(category, category);
+      where += `
+        AND (
+          category = $${params.length - 1}
+          OR category = $${params.length}
+        )
+      `;
+    }
 
+    // pagination
+    params.push(limit, offset);
     const limitIdx = params.length - 1;
     const offsetIdx = params.length;
 
@@ -202,9 +231,6 @@ exports.listVideos = async (req, res) => {
         storage_type,
         views,
         category,
-        meta_title,
-        meta_description,
-        focus_keywords,
         is_active,
         created_at
       FROM videos
@@ -212,7 +238,14 @@ exports.listVideos = async (req, res) => {
       ORDER BY created_at DESC
       LIMIT $${limitIdx} OFFSET $${offsetIdx}
       `,
-      params
+      params,
+    );
+
+    // total count
+    const countParams = params.slice(0, params.length - 2);
+    const { rows: countRows } = await db.query(
+      `SELECT COUNT(*) FROM videos ${where}`,
+      countParams,
     );
 
     res.json({
@@ -224,6 +257,10 @@ exports.listVideos = async (req, res) => {
             ? absoluteUrl(`/api/stream/${v.id}`, req)
             : absoluteUrl(v.video_url, req),
       })),
+      page,
+      limit,
+      total: Number(countRows[0].count),
+      totalPages: Math.ceil(countRows[0].count / limit),
     });
   } catch (err) {
     console.error("Admin list error:", err);
@@ -258,7 +295,7 @@ exports.updateVideo = async (req, res) => {
 
     const { rows } = await db.query(
       `SELECT thumbnail_url FROM videos WHERE id = $1`,
-      [id]
+      [id],
     );
 
     if (!rows.length) {
@@ -303,7 +340,7 @@ exports.updateVideo = async (req, res) => {
         keywordsArray,
         newThumbnailUrl,
         id,
-      ]
+      ],
     );
 
     res.json({ success: true });
@@ -324,7 +361,7 @@ exports.deleteVideo = async (req, res) => {
 
     const { rows } = await db.query(
       `SELECT video_url, thumbnail_url, storage_type FROM videos WHERE id = $1`,
-      [id]
+      [id],
     );
 
     if (!rows.length) {
@@ -380,7 +417,7 @@ exports.createCategory = async (req, res) => {
       VALUES ($1, $2, $3)
       ON CONFLICT (name) DO NOTHING
       `,
-      [name.trim(), slug, imagePath]
+      [name.trim(), slug, imagePath],
     );
 
     res.json({ success: true });
@@ -415,7 +452,7 @@ exports.deleteCategories = async (req, res) => {
       FROM video_categories
       WHERE id = ANY($1)
       `,
-      [categoryIds]
+      [categoryIds],
     );
 
     // 2️⃣ Delete DB records
@@ -424,7 +461,7 @@ exports.deleteCategories = async (req, res) => {
       DELETE FROM video_categories
       WHERE id = ANY($1)
       `,
-      [categoryIds]
+      [categoryIds],
     );
 
     // 3️⃣ Delete images from disk
