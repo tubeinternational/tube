@@ -331,9 +331,6 @@ header {
     display: block !important;
   } /* Show mobile search icon on small screens */
 
-  .header-right .btn-login {
-    display: none;
-  } /* Hide Login text, keep signup */
   .video-grid {
     grid-template-columns: 1fr;
   } /* 1 Column on phone */
@@ -390,4 +387,18 @@ header {
 
 #catDropdown a{
   cursor: pointer;
+}
+
+@media( max-width: 600px) {
+  .footer-seo {
+    font-size: 0.85rem;
+  }
+  .userEmail{
+    display: none;
+  }
+}
+
+/* You can add global styles to this file, and also import other style files */
+.text-pink{
+    color: var(--primary) !important;
 }

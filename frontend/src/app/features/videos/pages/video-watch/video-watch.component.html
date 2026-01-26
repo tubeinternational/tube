@@ -79,8 +79,8 @@
 
             <!-- TIME -->
             <div class="time-display">
-              {{ currentTime | number : "1.0-0" }} /
-              {{ duration | number : "1.0-0" }}
+              {{ currentTime | number: "1.0-0" }} /
+              {{ duration | number: "1.0-0" }}
             </div>
 
             <!-- FULLSCREEN -->
@@ -108,7 +108,10 @@
             <i class="fa-solid fa-list me-2"></i> {{ video.category }}
           </span>
           <span class="country" *ngIf="video.country">
-            <span *ngIf="countryFlag" class=" me-2 fi fi-{{ countryFlag }}"></span>
+            <span
+              *ngIf="countryFlag"
+              class=" me-2 fi fi-{{ countryFlag }}"
+            ></span>
             {{ video.country | titlecase }}
           </span>
           <span class="country" *ngIf="!video.country">
@@ -123,7 +126,7 @@
           <div class="meta-row justify-content-lg-end">
             <span class="views">{{ video.views || 0 }} views</span>
             <span class="date">
-              {{ video.created_at | date : "mediumDate" }}
+              {{ video.created_at | date: "mediumDate" }}
             </span>
           </div>
 
@@ -133,7 +136,8 @@
               [class.liked]="video.is_liked"
               (click)="onLike()"
             >
-              ❤️ {{ video.likes_count || 0 }}
+              <i class="fa-regular fa-thumbs-up text-pink"></i>
+              {{ video.likes_count || 0 }}
             </button>
 
             <div class="share-wrapper position-relative">

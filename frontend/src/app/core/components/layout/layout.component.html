@@ -31,7 +31,7 @@
       <i class="fas fa-search"></i>
     </button>
     <ng-container *ngIf="isAdmin">
-      <p class="mb-0 fw-semibold">
+      <p class="mb-0 fw-semibold userEmail">
         {{ userEmail }}
       </p>
 
@@ -82,6 +82,9 @@
       <a class="nav-link" routerLink="/" [queryParams]="{ sort: 'trending' }"
         ><i class="fas fa-fire"></i> Trending
       </a>
+    </li>
+    <li>
+      <a class="nav-link" routerLink="/shorts"><i class="fas fa-fire"></i> Shorts </a>
     </li>
   </ul>
 

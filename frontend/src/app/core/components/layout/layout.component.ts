@@ -59,9 +59,12 @@ export class LayoutComponent implements AfterViewInit, OnDestroy {
     this.router.events
       .pipe(filter((event) => event instanceof NavigationEnd))
       .subscribe((event: NavigationEnd) => {
-        this.hideFooter = event.urlAfterRedirects.startsWith('/shorts');
-        this.hideFooter = event.urlAfterRedirects.startsWith('/content-dashboard-admin');
-        this.hideFooter = event.urlAfterRedirects.startsWith('/requests');
+        const url = event.urlAfterRedirects;
+
+        this.hideFooter =
+          url.startsWith('/shorts') ||
+          url.startsWith('/content-dashboard-admin') ||
+          url.startsWith('/requests');
       });
   }
 
