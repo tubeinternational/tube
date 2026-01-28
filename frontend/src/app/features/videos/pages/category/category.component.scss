@@ -54,3 +54,9 @@
   padding: 6px;
   border-radius: 6px;
 }
+
+@media(max-width: 450px){
+  .category-card{
+    height: 150px;
+  }
+}
