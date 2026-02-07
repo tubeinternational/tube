@@ -16,8 +16,16 @@
 
       <div class="overlay"></div>
 
-      <div class="short-info">
-        <p class="caption">{{ video.title }}</p>
+      <!-- FOOTER INFO -->
+      <div
+        class="short-footer"
+        (click)="toggleDescription(i, $event)"
+      >
+        <p class="title">{{ video.title }}</p>
+
+        <p class="description" *ngIf="expandedIndex === i">
+          {{ video.description }}
+        </p>
       </div>
 
       <app-shorts-actions

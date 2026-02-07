@@ -55,8 +55,20 @@
   border-radius: 6px;
 }
 
-@media(max-width: 450px){
-  .category-card{
-    height: 150px;
+@media (max-width: 450px) {
+  .category-card {
+    height: auto; // 👈 remove fixed height
+    aspect-ratio: 16 / 10; // 👈 balanced mobile ratio
+    background: #111;
   }
+
+  .category-img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain; // full image
+  }
+}
+
+.category-card {
+  background: linear-gradient(135deg, #1a1a1a, #0e0e0e);
 }

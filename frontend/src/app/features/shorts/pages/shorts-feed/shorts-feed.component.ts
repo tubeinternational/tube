@@ -2,26 +2,32 @@ import {
   Component,
   OnInit,
   AfterViewInit,
+  OnDestroy,
   QueryList,
   ViewChildren,
   ElementRef,
+  Renderer2,
 } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { ActivatedRoute, Router } from '@angular/router';
+
 import { ShortsFeedService } from '../../services/shorts-feed.service';
+import { VideoService } from '../../../videos/services/video.service';
 import { Video } from '../../../videos/models/video.model';
+
 import { ShortsActionsComponent } from '../../components/shorts-actions/shorts-actions.component';
 import { ShortsPlayerComponent } from '../../components/shorts-player/shorts-player.component';
-import { CommonModule } from '@angular/common';
-import { VideoService } from '../../../videos/services/video.service';
-import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-shorts-feed',
   standalone: true,
   templateUrl: './shorts-feed.component.html',
   styleUrls: ['./shorts-feed.component.scss'],
-  imports: [ShortsActionsComponent, ShortsPlayerComponent, CommonModule],
+  imports: [CommonModule, ShortsActionsComponent, ShortsPlayerComponent],
 })
-export class ShortsFeedComponent implements OnInit, AfterViewInit {
+export class ShortsFeedComponent
+  implements OnInit, AfterViewInit, OnDestroy
+{
   shorts: Video[] = [];
   page = 1;
   loading = false;
@@ -29,9 +35,11 @@ export class ShortsFeedComponent implements OnInit, AfterViewInit {
   muted = true;
 
   activeIndex = 0;
+  expandedIndex: number | null = null;
 
   private observer!: IntersectionObserver;
   private viewed = new Set<string>();
+  private initialSlug?: string;
 
   @ViewChildren('shortEl') shortElements!: QueryList<ElementRef>;
 
@@ -39,11 +47,19 @@ export class ShortsFeedComponent implements OnInit, AfterViewInit {
     private shortsService: ShortsFeedService,
     private videoService: VideoService,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private renderer: Renderer2
   ) {}
 
+  /* =========================
+   * INIT / DESTROY
+   * ========================= */
   ngOnInit(): void {
+    // Lock layout scrolling
+    this.renderer.addClass(document.body, 'shorts-page');
+
     const slug = this.route.snapshot.paramMap.get('slug');
+    this.initialSlug = slug || undefined;
 
     if (slug) {
       this.loadShortBySlug(slug);
@@ -54,13 +70,17 @@ export class ShortsFeedComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit(): void {
     this.setupObserver();
-
-    // ✅ THIS IS THE MISSING PIECE
-    this.shortElements.changes.subscribe(() => {
-      this.observeShorts();
-    });
+    this.shortElements.changes.subscribe(() => this.observeShorts());
   }
 
+  ngOnDestroy(): void {
+    this.renderer.removeClass(document.body, 'shorts-page');
+    if (this.observer) this.observer.disconnect();
+  }
+
+  /* =========================
+   * DATA LOADING
+   * ========================= */
   loadShorts() {
     if (this.loading || !this.hasMore) return;
 
@@ -68,14 +88,16 @@ export class ShortsFeedComponent implements OnInit, AfterViewInit {
 
     this.shortsService.getShorts(this.page).subscribe({
       next: (res) => {
-        this.shorts.push(...res.items);
+        const filtered = this.initialSlug
+          ? res.items.filter((v) => v.slug !== this.initialSlug)
+          : res.items;
+
+        this.shorts.push(...filtered);
         this.hasMore = res.hasMore;
         this.page++;
         this.loading = false;
       },
-      error: () => {
-        this.loading = false;
-      },
+      error: () => (this.loading = false),
     });
   }
 
@@ -86,16 +108,15 @@ export class ShortsFeedComponent implements OnInit, AfterViewInit {
       next: (video) => {
         this.shorts = [video];
         this.activeIndex = 0;
+        this.page = 1;
         this.loading = false;
         this.loadShorts();
       },
-      error: () => {
-        this.loading = false;
-      },
+      error: () => (this.loading = false),
     });
   }
 
-  /** =========================
+  /* =========================
    * INTERSECTION OBSERVER
    * ========================= */
   private setupObserver() {
@@ -125,34 +146,36 @@ export class ShortsFeedComponent implements OnInit, AfterViewInit {
     );
   }
 
-  /** =========================
-   * ACTIVE SHORT HANDLER
+  /* =========================
+   * ACTIVE SHORT
    * ========================= */
   setActive(index: number) {
     this.activeIndex = index;
+    this.expandedIndex = null;
 
     const video = this.shorts[index];
     if (!video) return;
 
-    // 🔁 Update URL without reload
     if (video.slug) {
       this.router.navigate(['/shorts', video.slug], { replaceUrl: true });
     }
 
-    // 👁️ View count once per session
     if (!this.viewed.has(video.id)) {
       this.viewed.add(video.id);
-      this.incrementView(video.id);
+      this.videoService.incrementViews(video.id).subscribe();
     }
 
-    // 🚀 Prefetch more
     if (index >= this.shorts.length - 3) {
       this.loadShorts();
     }
   }
 
-  private incrementView(videoId: string) {
-    this.videoService.incrementViews(videoId).subscribe();
+  /* =========================
+   * UI ACTIONS
+   * ========================= */
+  toggleDescription(index: number, event: Event) {
+    event.stopPropagation();
+    this.expandedIndex = this.expandedIndex === index ? null : index;
   }
 
   onLike(video: Video) {

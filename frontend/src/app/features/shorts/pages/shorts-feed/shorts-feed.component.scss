@@ -1,20 +1,26 @@
-/* Full page black */
-.shorts-feed {
-  height: 90vh;
-  top: 10%;
-//   background: black;
-  display: flex;
-  justify-content: center;
+:host {
+  display: block;
+  width: 100%;
+  height: 100%;
   overflow: hidden;
-  // margin-top: 52px !important;
 }
 
-/* This is the YouTube Shorts stage */
+/* Root */
+.shorts-feed {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  background: black;
+  overflow: hidden;
+}
+
+/* Scroll container */
 .shorts-stage {
   width: 100%;
-  max-width: 420px; // 👈 desktop shorts width
-  height: 100vh;
-  overflow-y: scroll;
+  max-width: 420px;
+  height: 100%;
+  overflow-y: auto;
   scroll-snap-type: y mandatory;
   scrollbar-width: none;
 }
@@ -25,12 +31,50 @@
 
 /* Single short */
 .short {
+  height: 100%;
   position: relative;
-  height: 100vh;
   scroll-snap-align: start;
   overflow: hidden;
 }
 
-.footer{
-  display: none !important;
+/* Overlay gradient */
+.overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.7),
+    transparent 45%
+  );
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Footer info */
+.short-footer {
+  position: absolute;
+  bottom: 16px;
+  left: 16px;
+  right: 72px;
+  z-index: 2;
+  color: #fff;
+  cursor: pointer;
+}
+
+.short-footer .title {
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.3;
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.short-footer .description {
+  margin-top: 6px;
+  font-size: 13px;
+  line-height: 1.4;
+  opacity: 0.9;
 }
