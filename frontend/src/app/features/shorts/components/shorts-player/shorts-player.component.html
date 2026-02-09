@@ -1,14 +1,24 @@
-<video
-  #videoEl
-  class="shorts-video"
-  [poster]="poster"
-  preload="metadata"
-  playsinline
-  muted
-  (click)="togglePlay()"
-  controlsList="nodownload noremoteplayback"
-  disablePictureInPicture
-  (contextmenu)="$event.preventDefault()"
->
-  <source [src]="src" type="video/mp4" />
-</video>
+<div class="player-root">
+  <video
+    #videoEl
+    class="shorts-video"
+    [poster]="poster"
+    preload="metadata"
+    playsinline
+    [muted]="muted"
+    (click)="togglePlay()"
+    (play)="onPlay()"
+    (pause)="onPause()"
+    controlsList="nodownload noremoteplayback"
+    disablePictureInPicture
+    (contextmenu)="$event.preventDefault()"
+  >
+    <source [src]="src" type="video/mp4" />
+  </video>
+
+  <div class="play-overlay" [class.show]="showOverlay || isPaused" (click)="togglePlay()">
+    <div class="icon">
+      <i class="fas" [class.fa-play]="isPaused" [class.fa-pause]="!isPaused"></i>
+    </div>
+  </div>
+</div>

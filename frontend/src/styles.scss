@@ -5,6 +5,11 @@ body {
   overflow-x: hidden; // 🔥 kills horizontal scrollbar forever
 }
 
+/* When viewing shorts, lock page scrolling and let the shorts stage handle scroll */
+body.shorts-page {
+  overflow: hidden;
+}
+
 /* You can add global styles to this file, and also import other style files */
 .text-pink{
     color: var(--text-primary);

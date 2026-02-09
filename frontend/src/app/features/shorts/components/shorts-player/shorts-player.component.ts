@@ -6,6 +6,7 @@ import {
   OnChanges,
   SimpleChanges,
   AfterViewInit,
+  OnDestroy,
 } from '@angular/core';
 
 @Component({
@@ -14,7 +15,7 @@ import {
   templateUrl: './shorts-player.component.html',
   styleUrls: ['./shorts-player.component.scss'],
 })
-export class ShortsPlayerComponent implements OnChanges, AfterViewInit {
+export class ShortsPlayerComponent implements OnChanges, AfterViewInit, OnDestroy {
   @Input() src!: string;
   @Input() poster?: string;
   @Input() active = false;
@@ -24,6 +25,10 @@ export class ShortsPlayerComponent implements OnChanges, AfterViewInit {
 
   @ViewChild('videoEl', { static: true })
   videoEl!: ElementRef<HTMLVideoElement>;
+
+  isPaused = true;
+  showOverlay = false;
+  private overlayTimeout: any = null;
 
   ngAfterViewInit(): void {
     this.syncMute();
@@ -42,9 +47,33 @@ export class ShortsPlayerComponent implements OnChanges, AfterViewInit {
     }
   }
 
+  ngOnDestroy(): void {
+    if (this.overlayTimeout) {
+      clearTimeout(this.overlayTimeout);
+    }
+  }
+
   togglePlay() {
     const video = this.videoEl.nativeElement;
-    video.paused ? video.play() : video.pause();
+    if (video.paused) {
+      video.play().catch(() => {});
+      this.isPaused = false;
+      this.showTransientOverlay();
+    } else {
+      video.pause();
+      this.isPaused = true;
+      this.showOverlay = true;
+    }
+  }
+
+  onPlay() {
+    this.isPaused = false;
+    this.showTransientOverlay();
+  }
+
+  onPause() {
+    this.isPaused = true;
+    this.showOverlay = true;
   }
 
   private tryPlay() {
@@ -59,6 +88,15 @@ export class ShortsPlayerComponent implements OnChanges, AfterViewInit {
         video.play().catch(() => {});
       };
     }
+  }
+
+  private showTransientOverlay() {
+    this.showOverlay = true;
+    if (this.overlayTimeout) clearTimeout(this.overlayTimeout);
+    this.overlayTimeout = setTimeout(() => {
+      this.showOverlay = false;
+      this.overlayTimeout = null;
+    }, 700);
   }
 
   private pause() {
