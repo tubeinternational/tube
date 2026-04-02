@@ -116,10 +116,18 @@
   </div>
 
   <!-- 📄 PAGINATION -->
-  <nav *ngIf="totalPages > 1" class="d-flex justify-content-end mt-3">
+  <nav class="d-flex justify-content-end mt-3">
     <ul class="pagination pagination-sm">
-      <li class="page-item" [class.disabled]="currentPage === 1">
-        <button class="page-link" (click)="fetchVideos(currentPage - 1)">
+      <li
+        class="page-item"
+        [class.disabled]="totalPages === 1 || currentPage === 1"
+      >
+        <button
+          type="button"
+          class="page-link"
+          (click)="onPageChange(currentPage - 1)"
+          [disabled]="totalPages === 1 || currentPage === 1"
+        >
           Prev
         </button>
       </li>
@@ -129,13 +137,26 @@
         *ngFor="let page of pages"
         [class.active]="page === currentPage"
       >
-        <button class="page-link" (click)="fetchVideos(page)">
+        <button
+          type="button"
+          class="page-link"
+          (click)="onPageChange(page)"
+          [disabled]="totalPages === 1"
+        >
           {{ page }}
         </button>
       </li>
 
-      <li class="page-item" [class.disabled]="currentPage === totalPages">
-        <button class="page-link" (click)="fetchVideos(currentPage + 1)">
+      <li
+        class="page-item"
+        [class.disabled]="totalPages === 1 || currentPage === totalPages"
+      >
+        <button
+          type="button"
+          class="page-link"
+          (click)="onPageChange(currentPage + 1)"
+          [disabled]="totalPages === 1 || currentPage === totalPages"
+        >
           Next
         </button>
       </li>

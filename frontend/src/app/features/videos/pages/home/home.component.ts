@@ -1,12 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
+import { Meta, Title } from '@angular/platform-browser';
+
 import { VideoCardComponent } from '../../components/video-card/video-card.component';
 import { Video } from '../../models/video.model';
 import { VideoService } from '../../services/video.service';
 import { buildPaginationPages } from '../../../../shared/utils/pagination.utils';
 import { DEFAULT_SEO } from '../../../../core/seo/default.seo';
-import { Meta, Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-home',
@@ -19,16 +20,14 @@ export class HomeComponent implements OnInit {
   videos: Video[] = [];
   loading = false;
 
-  // 🔎 filters
   query = '';
   category = '';
-  country = ''; // ✅ ADD THIS
+  country = '';
   sort: 'latest' | 'trending' | 'views' = 'latest';
 
-  // 📄 pagination
   currentPage = 1;
   limit = 25;
-  totalPages = 0;
+  totalPages = 1;
   total = 0;
 
   constructor(
@@ -54,16 +53,16 @@ export class HomeComponent implements OnInit {
     this.route.queryParams.subscribe((params) => {
       this.query = params['q'] || '';
       this.category = params['category'] || '';
-      this.country = params['country'] || ''; // ✅ ADD THIS
+      this.country = params['country'] || '';
       this.sort = params['sort'] || 'latest';
-
-      // reset when filters change
       this.currentPage = 1;
       this.fetchVideos(1);
     });
   }
 
   fetchVideos(page = this.currentPage): void {
+    if (page < 1 || page > this.totalPages) return;
+
     this.loading = true;
 
     this.videoService
@@ -73,14 +72,21 @@ export class HomeComponent implements OnInit {
         q: this.query || undefined,
         category: this.category || undefined,
         country: this.country || undefined,
-        sort: this.sort !== 'latest' ? this.sort : undefined, // ✅ ADD
+        sort: this.sort !== 'latest' ? this.sort : undefined,
       })
       .subscribe({
         next: (res) => {
-          this.videos = res.results;
-          this.currentPage = res.page;
-          this.totalPages = res.totalPages;
-          this.total = res.total;
+          this.videos = Array.isArray(res.results) ? res.results : [];
+          this.currentPage = res.page || 1;
+          this.totalPages = res.totalPages || 1;
+          this.total = res.total || 0;
+
+          console.log({
+            page: res.page,
+            totalPages: res.totalPages,
+            total: res.total,
+          });
+
           this.loading = false;
         },
         error: (err) => {
@@ -91,11 +97,15 @@ export class HomeComponent implements OnInit {
   }
 
   onPageChange(page: number): void {
-    if (page === this.currentPage) return;
+    if (page === this.currentPage || page < 1 || page > this.totalPages) {
+      return;
+    }
+
     this.fetchVideos(page);
   }
 
   get pages(): number[] {
+    if (!this.totalPages) return [1];
     return buildPaginationPages(this.currentPage, this.totalPages, 2);
   }
 }

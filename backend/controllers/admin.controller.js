@@ -3,6 +3,7 @@ const fs = require("fs");
 const path = require("path");
 const { resolveUploadPath } = require("../utils/paths");
 const { absoluteUrl } = require("../utils/url");
+const { getPaginationMeta } = require("../utils/pagination");
 
 const VALID_STORAGE = ["local", "cloudflare"];
 const VALID_VIDEO_TYPES = ["normal", "short"];
@@ -171,9 +172,11 @@ exports.addVideo = async (req, res) => {
  */
 exports.listVideos = async (req, res) => {
   try {
-    const page = Math.max(+req.query.page || 1, 1);
-    const limit = Math.min(+req.query.limit || 25, 50);
-    const offset = (page - 1) * limit;
+    const requestedPage = Math.max(parseInt(req.query.page, 10) || 1, 1);
+    const requestedLimit = Math.max(
+      Math.min(parseInt(req.query.limit, 10) || 25, 50),
+      1,
+    );
 
     let q = req.query.q?.trim();
     const category = req.query.category?.trim();
@@ -213,10 +216,20 @@ exports.listVideos = async (req, res) => {
       `;
     }
 
-    // pagination
-    params.push(limit, offset);
-    const limitIdx = params.length - 1;
-    const offsetIdx = params.length;
+    const { rows: countRows } = await db.query(
+      `SELECT COUNT(*)::int AS total FROM videos ${where}`,
+      params,
+    );
+
+    const pagination = getPaginationMeta(
+      requestedPage,
+      requestedLimit,
+      countRows[0]?.total,
+    );
+
+    const queryParams = [...params, pagination.limit, pagination.offset];
+    const limitIdx = queryParams.length - 1;
+    const offsetIdx = queryParams.length;
 
     const { rows } = await db.query(
       `
@@ -229,6 +242,7 @@ exports.listVideos = async (req, res) => {
         thumbnail_url,
         video_url,
         storage_type,
+        duration,
         views,
         category,
         is_active,
@@ -238,29 +252,24 @@ exports.listVideos = async (req, res) => {
       ORDER BY created_at DESC
       LIMIT $${limitIdx} OFFSET $${offsetIdx}
       `,
-      params,
-    );
-
-    // total count
-    const countParams = params.slice(0, params.length - 2);
-    const { rows: countRows } = await db.query(
-      `SELECT COUNT(*) FROM videos ${where}`,
-      countParams,
+      queryParams,
     );
 
     res.json({
       results: rows.map((v) => ({
         ...v,
+        duration: v.duration ?? null,
+        views: Number(v.views) || 0,
         thumbnail_url: absoluteUrl(v.thumbnail_url, req),
         video_url:
           v.storage_type === "local"
             ? absoluteUrl(`/api/stream/${v.id}`, req)
             : absoluteUrl(v.video_url, req),
       })),
-      page,
-      limit,
-      total: Number(countRows[0].count),
-      totalPages: Math.ceil(countRows[0].count / limit),
+      page: pagination.page,
+      limit: pagination.limit,
+      total: pagination.total,
+      totalPages: pagination.totalPages,
     });
   } catch (err) {
     console.error("Admin list error:", err);

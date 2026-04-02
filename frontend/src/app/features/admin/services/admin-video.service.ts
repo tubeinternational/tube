@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import {
@@ -37,15 +37,22 @@ export class AdminVideoService {
    * =========================
    * GET /api/admin/videos
    */
-  getVideos(page = 1, limit = 25, q?: string, category?: string | null) {
-    const params: any = { page, limit };
+  getVideos(
+    page = 1,
+    limit = 25,
+    q?: string,
+    category?: string | null,
+  ): Observable<PaginatedVideos> {
+    let params = new HttpParams()
+      .set('page', String(page))
+      .set('limit', String(limit));
 
     if (q && q.trim()) {
-      params.q = q.trim();
+      params = params.set('q', q.trim());
     }
 
     if (category && category !== 'undefined') {
-      params.category = category;
+      params = params.set('category', category);
     }
 
     return this.http
@@ -53,10 +60,17 @@ export class AdminVideoService {
       .pipe(
         map((res) => ({
           ...res,
-          results: res.results.map((v) => ({
-            ...v,
-            views: Number(v.views) || 0,
-          })),
+          page: Number(res.page) || 1,
+          limit: Number(res.limit) || 25,
+          total: Number(res.total) || 0,
+          totalPages: Math.max(Number(res.totalPages) || 1, 1),
+          results: Array.isArray(res.results)
+            ? res.results.map((v) => ({
+                ...v,
+                duration: v.duration ?? null,
+                views: Number(v.views) || 0,
+              }))
+            : [],
         })),
       );
   }

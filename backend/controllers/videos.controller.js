@@ -1,6 +1,7 @@
 const db = require("../db");
 const crypto = require("crypto");
 const { absoluteUrl } = require("../utils/url");
+const { getPaginationMeta } = require("../utils/pagination");
 
 /**
  * =========================
@@ -9,9 +10,11 @@ const { absoluteUrl } = require("../utils/url");
  */
 exports.getVideos = async (req, res) => {
   try {
-    const page = Math.max(parseInt(req.query.page) || 1, 1);
-    const limit = Math.min(parseInt(req.query.limit) || 25, 50);
-    const offset = (page - 1) * limit;
+    const requestedPage = Math.max(parseInt(req.query.page, 10) || 1, 1);
+    const requestedLimit = Math.max(
+      Math.min(parseInt(req.query.limit, 10) || 25, 50),
+      1,
+    );
 
     const q = req.query.q?.trim();
     const category = req.query.category?.trim();
@@ -52,7 +55,22 @@ exports.getVideos = async (req, res) => {
       orderBySql = `ORDER BY views DESC, created_at DESC`;
     }
 
-    params.push(limit, offset);
+    const { rows: countRows } = await db.query(
+      `
+      SELECT COUNT(*)::int AS total
+      FROM videos
+      ${whereSql}
+      `,
+      params,
+    );
+
+    const pagination = getPaginationMeta(
+      requestedPage,
+      requestedLimit,
+      countRows[0]?.total,
+    );
+
+    const queryParams = [...params, pagination.limit, pagination.offset];
 
     const { rows } = await db.query(
       `
@@ -70,22 +88,25 @@ exports.getVideos = async (req, res) => {
       FROM videos
       ${whereSql}
       ${orderBySql}
-      LIMIT $${params.length - 1}
-      OFFSET $${params.length}
+      LIMIT $${queryParams.length - 1}
+      OFFSET $${queryParams.length}
       `,
-      params,
+      queryParams,
     );
 
     res.json({
       results: rows.map((v) => ({
         ...v,
+        duration: v.duration ?? null,
+        views: Number(v.views) || 0,
         thumbnail_url: absoluteUrl(v.thumbnail_url, req),
         stream_url:
           v.storage_type === "local" ? `/api/stream/${v.id}` : v.video_url,
       })),
-      page,
-      totalPages: Math.ceil(rows.length / limit),
-      total: rows.length,
+      page: pagination.page,
+      limit: pagination.limit,
+      total: pagination.total,
+      totalPages: pagination.totalPages,
     });
   } catch (err) {
     console.error("Fetch videos error:", err);

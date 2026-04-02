@@ -470,3 +470,8 @@ header {
   margin-left: 0;
   margin-right: 0;
 }
+
+.active > .page-link {
+  background: var(--primary) !important;
+  border: 1px solid var(--primary) !important;
+}

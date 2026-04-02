@@ -3,7 +3,7 @@ export interface Video {
 
   // Core
   title: string;
-  description?: string;
+  description?: string | null;
   slug?: string;
   video_type?: 'normal' | 'short';
 
@@ -14,10 +14,10 @@ export interface Video {
 
   // UI / metadata
   thumbnail_url?: string;
-  duration?: number;
+  duration?: number | null;
   views?: number;
-  category?: string;
-  country?: string;
+  category?: string | null;
+  country?: string | null;
 
   // 🔥 Engagement (ADD THIS)
   likes_count?: number;

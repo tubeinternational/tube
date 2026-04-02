@@ -31,18 +31,19 @@
 </div>
 
 <!-- PAGINATION -->
-<nav
-  *ngIf="totalPages > 1"
-  class="d-flex justify-content-center mt-4"
->
+<nav class="d-flex justify-content-center mt-4">
   <ul class="pagination">
 
     <!-- Prev -->
-    <li class="page-item" [class.disabled]="currentPage === 1">
+    <li
+      class="page-item"
+      [class.disabled]="totalPages === 1 || currentPage === 1"
+    >
       <button
+        type="button"
         class="page-link"
-        (click)="fetchVideos(currentPage - 1)"
-        [disabled]="currentPage === 1"
+        (click)="onPageChange(currentPage - 1)"
+        [disabled]="totalPages === 1 || currentPage === 1"
       >
         Prev
       </button>
@@ -55,19 +56,25 @@
       [class.active]="page === currentPage"
     >
       <button
+        type="button"
         class="page-link"
-        (click)="fetchVideos(page)"
+        (click)="onPageChange(page)"
+        [disabled]="totalPages === 1"
       >
         {{ page }}
       </button>
     </li>
 
     <!-- Next -->
-    <li class="page-item" [class.disabled]="currentPage === totalPages">
+    <li
+      class="page-item"
+      [class.disabled]="totalPages === 1 || currentPage === totalPages"
+    >
       <button
+        type="button"
         class="page-link"
-        (click)="fetchVideos(currentPage + 1)"
-        [disabled]="currentPage === totalPages"
+        (click)="onPageChange(currentPage + 1)"
+        [disabled]="totalPages === 1 || currentPage === totalPages"
       >
         Next
       </button>

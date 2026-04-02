@@ -26,10 +26,9 @@ export class AdminVideosComponent implements OnInit {
 
   currentPage = 1;
   limit = 25;
-  totalPages = 0;
+  totalPages = 1;
   total = 0;
 
-  // 🔍 SEARCH / FILTER STATE
   searchQuery = '';
   selectedCategory = '';
 
@@ -43,10 +42,9 @@ export class AdminVideosComponent implements OnInit {
     this.loadCategories();
   }
 
-  // =========================
-  // FETCH VIDEOS
-  // =========================
-  fetchVideos(page = 1): void {
+  fetchVideos(page = this.currentPage): void {
+    if (page < 1 || page > this.totalPages) return;
+
     this.loading = true;
 
     this.adminService
@@ -58,28 +56,29 @@ export class AdminVideosComponent implements OnInit {
       )
       .subscribe({
         next: (res) => {
-          this.videos = res.results;
-          this.currentPage = res.page;
-          this.totalPages = res.totalPages;
-          this.total = res.total;
+          this.videos = Array.isArray(res.results) ? res.results : [];
+          this.currentPage = res.page || 1;
+          this.totalPages = res.totalPages || 1;
+          this.total = res.total || 0;
+
+          console.log({
+            page: res.page,
+            totalPages: res.totalPages,
+            total: res.total,
+          });
+
           this.loading = false;
         },
         error: () => (this.loading = false),
       });
   }
 
-  // =========================
-  // LOAD CATEGORIES
-  // =========================
   loadCategories(): void {
     this.adminService.getCategories().subscribe({
       next: (cats) => (this.categories = cats),
     });
   }
 
-  // =========================
-  // SEARCH HANDLER
-  // =========================
   onSearch(): void {
     this.fetchVideos(1);
   }
@@ -90,9 +89,6 @@ export class AdminVideosComponent implements OnInit {
     this.fetchVideos(1);
   }
 
-  // =========================
-  // UI HELPERS
-  // =========================
   getViewRoute(video: Video): any[] {
     return video.video_type === 'short'
       ? ['/shorts', video.slug]
@@ -100,12 +96,18 @@ export class AdminVideosComponent implements OnInit {
   }
 
   get pages(): number[] {
+    if (!this.totalPages) return [1];
     return buildPaginationPages(this.currentPage, this.totalPages, 2);
   }
 
-  // =========================
-  // MODALS & ACTIONS
-  // =========================
+  onPageChange(page: number): void {
+    if (page === this.currentPage || page < 1 || page > this.totalPages) {
+      return;
+    }
+
+    this.fetchVideos(page);
+  }
+
   openAddModal(): void {
     const ref = this.modal.open(AddVideoComponent, {
       size: 'lg',
