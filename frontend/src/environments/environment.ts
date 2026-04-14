@@ -8,5 +8,5 @@ declare global {
 
 export const environment = {
   production: false,
-  baseUrl: window.__env?.baseUrl || 'http://localhost:5000/api',
+  baseUrl: window.__env?.baseUrl || '/api',
 };

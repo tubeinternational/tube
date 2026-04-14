@@ -1,3 +1,7 @@
+@use "flag-icons/sass/flag-icons" with (
+  $flag-icons-use-square: false
+);
+
 html,
 body {
   width: 100%;

@@ -2,8 +2,9 @@ const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
 
-// 🔑 Docker-mounted uploads directory
-const UPLOADS_ROOT = "/app/uploads";
+// Dynamically resolve uploads directory
+// Works in both Docker (/app/uploads mounted to root/uploads) and local dev
+const UPLOADS_ROOT = path.join(__dirname, "..", "uploads");
 
 const ensureDir = (dir) => {
   if (!fs.existsSync(dir)) {
