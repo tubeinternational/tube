@@ -8,17 +8,27 @@ import { Video } from '../../models/video.model';
 import { VideoService } from '../../services/video.service';
 import { buildPaginationPages } from '../../../../shared/utils/pagination.utils';
 import { DEFAULT_SEO } from '../../../../core/seo/default.seo';
+import { AdRendererComponent } from '../../../../shared/components/ad-renderer/ad-renderer.component';
+import { Ad } from '../../../manage-ads/models/manage-ads.model';
+import { ManageAdsService } from '../../../manage-ads/services/manage-ads.service';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, VideoCardComponent],
+  imports: [CommonModule, VideoCardComponent, AdRendererComponent],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss'],
 })
 export class HomeComponent implements OnInit {
   videos: Video[] = [];
   loading = false;
+
+  // ====================================
+  // PRODUCTION-GRADE AD SYSTEM
+  // ====================================
+  // Multiple ad placements, properly filtered by device
+  homeTopAds: Ad[] = [];
+  homeGridAds: Ad[] = [];
 
   query = '';
   category = '';
@@ -35,6 +45,7 @@ export class HomeComponent implements OnInit {
     private route: ActivatedRoute,
     private title: Title,
     private meta: Meta,
+    private adsService: ManageAdsService,
   ) {}
 
   ngOnInit(): void {
@@ -50,6 +61,11 @@ export class HomeComponent implements OnInit {
       content: DEFAULT_SEO.keywords,
     });
 
+    // ====================================
+    // LOAD ADS WITH DEVICE DETECTION
+    // ====================================
+    this.loadAds();
+
     this.route.queryParams.subscribe((params) => {
       this.query = params['q'] || '';
       this.category = params['category'] || '';
@@ -57,6 +73,38 @@ export class HomeComponent implements OnInit {
       this.sort = params['sort'] || 'latest';
       this.currentPage = 1;
       this.fetchVideos(1);
+    });
+  }
+
+  /**
+   * =========================
+   * LOAD ADS
+   * =========================
+   * Production-grade: Uses device detection + placement filtering
+   * Respects active status and date ranges (via backend)
+   * Properly prioritizes ads
+   */
+  loadAds() {
+    // Get device type (mobile/desktop)
+    const deviceType = this.adsService.getDeviceType();
+
+    // Fetch ads for multiple HOME placements with device detection
+    this.adsService.getAdsByPlacements(['HOME_TOP', 'HOME_GRID'], deviceType).subscribe({
+      next: (ads) => {
+        // Filter by placement on frontend (backend already filtered by device)
+        this.homeTopAds = ads.filter((a) => a.placement === 'HOME_TOP' && a.is_active);
+        this.homeGridAds = ads.filter((a) => a.placement === 'HOME_GRID' && a.is_active);
+
+        console.log(
+          `[Home] Loaded ads - Device: ${deviceType}, TOP: ${this.homeTopAds.length}, GRID: ${this.homeGridAds.length}`,
+        );
+      },
+      error: (err) => {
+        console.error('[Home] Failed to load ads:', err);
+        // Gracefully handle ad load failure - don't break video page
+        this.homeTopAds = [];
+        this.homeGridAds = [];
+      },
     });
   }
 

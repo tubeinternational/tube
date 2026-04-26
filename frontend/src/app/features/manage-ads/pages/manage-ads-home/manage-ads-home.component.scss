@@ -1,0 +1,30 @@
+.ads-page {
+  .nav-tabs {
+    border-bottom: 1px solid #333;
+
+    .nav-link {
+      cursor: pointer;
+      color: #ccc;
+
+      &.active {
+        color: #fff;
+        border-color: #444 #444 #000;
+        background: #111;
+      }
+    }
+  }
+
+  .card {
+    background: #111;
+    border: 1px solid #333;
+    border-radius: 10px;
+  }
+
+  table {
+    font-size: 14px;
+  }
+
+  textarea {
+    font-family: monospace;
+  }
+}

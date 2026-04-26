@@ -137,6 +137,16 @@ export const routes: Routes = [
             (m) => m.AboutUsComponent,
           ),
       },
+
+      // MANAGE ADS
+      {
+        path: 'manage-ads',
+        canActivate: [AuthGuard],
+        loadComponent: () =>
+          import('./features/manage-ads/pages/manage-ads-home/manage-ads-home.component').then(
+            (m) => m.ManageAdsHomeComponent,
+          ),
+      },
     ],
   },
 

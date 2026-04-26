@@ -13,27 +13,28 @@
 </div>
 
 <!-- LOADING -->
-<div *ngIf="loading" class="loading">
-  Loading videos...
-</div>
+<div *ngIf="loading" class="loading">Loading videos...</div>
 
 <!-- EMPTY STATE -->
-<div *ngIf="!loading && videos.length === 0" class="empty">
-  No videos found
-</div>
+<div *ngIf="!loading && videos.length === 0" class="empty">No videos found</div>
+
+<app-ad-renderer *ngIf="homeTopAds.length" [ads]="homeTopAds"></app-ad-renderer>
 
 <!-- VIDEO GRID -->
-<div *ngIf="!loading && videos.length > 0" class="video-grid">
-  <app-video-card
-    *ngFor="let video of videos"
-    [video]="video"
-  ></app-video-card>
+<div class="video-grid">
+  <ng-container *ngFor="let video of videos; let i = index">
+    <app-video-card [video]="video"></app-video-card>
+
+    <!-- Inject ad after every 6 videos -->
+    <ng-container *ngIf="i === 5">
+      <app-ad-renderer [ads]="homeGridAds"></app-ad-renderer>
+    </ng-container>
+  </ng-container>
 </div>
 
 <!-- PAGINATION -->
 <nav class="d-flex justify-content-center mt-4">
   <ul class="pagination">
-
     <!-- Prev -->
     <li
       class="page-item"
@@ -79,6 +80,5 @@
         Next
       </button>
     </li>
-
   </ul>
 </nav>

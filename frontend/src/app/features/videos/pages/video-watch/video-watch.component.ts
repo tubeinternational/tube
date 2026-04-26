@@ -89,19 +89,23 @@ export class VideoWatchComponent implements OnInit, OnDestroy {
 
   toggleMute(): void {
     const video = this.videoRef.nativeElement;
-    video.muted = !video.muted;
+    
+    // Update component state FIRST, then DOM
+    this.muted = !this.muted;
+    
+    video.muted = this.muted;
 
-    if (!video.muted && video.volume === 0) {
-      video.volume = 0.5;
+    if (!this.muted && this.volume === 0) {
+      this.volume = 0.5;
+      video.volume = this.volume;
     }
-
-    this.muted = video.muted;
   }
 
   get volumeIcon(): string {
-    const video = this.videoRef?.nativeElement;
-    if (!video || this.muted || video.volume === 0) return 'fa-volume-xmark';
-    if (video.volume < 0.5) return 'fa-volume-low';
+    // Use component state instead of reading from DOM directly
+    // This prevents ExpressionChangedAfterItHasBeenCheckedError
+    if (this.muted || this.volume === 0) return 'fa-volume-xmark';
+    if (this.volume < 0.5) return 'fa-volume-low';
     return 'fa-volume-high';
   }
 
@@ -109,18 +113,23 @@ export class VideoWatchComponent implements OnInit, OnDestroy {
     const input = e.target as HTMLInputElement;
     const video = this.videoRef.nativeElement;
 
-    const vol = +input.value;
+    // Update component state FIRST, then DOM
+    this.volume = +input.value;
+    this.muted = this.volume === 0;
 
-    video.muted = false;
-    video.volume = vol;
-
-    this.muted = vol === 0;
+    // Then update the video element
+    video.muted = this.muted;
+    video.volume = this.volume;
   }
 
   onLoadedMetadata(e: Event): void {
     const video = e.target as HTMLVideoElement;
     this.duration = video.duration;
     this.isReady = true;
+    
+    // Sync component state with video element on load
+    this.volume = video.volume;
+    this.muted = video.muted;
   }
 
   onTimeUpdate(e: Event): void {
@@ -196,6 +205,8 @@ export class VideoWatchComponent implements OnInit, OnDestroy {
           this.isEnded = false;
           this.currentTime = 0;
           this.progress = 0;
+          this.muted = false;
+          this.volume = 1;
 
           this.videoService.incrementViews(video.id!).subscribe();
           this.videoService
