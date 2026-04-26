@@ -32,6 +32,7 @@ app.use("/api/auth", require("./routes/auth.routes"));
 app.use("/api/admin", require("./routes/admin.routes"));
 app.use("/api/videos", require("./routes/videos.routes"));
 app.use("/api/support", require("./routes/support.routes"));
+app.use("/api/ads", require("./routes/ads.routes"));
 app.use("/api", require("./routes/stream.routes"));
 
 const PORT = process.env.PORT || 5000;
