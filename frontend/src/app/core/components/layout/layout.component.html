@@ -165,6 +165,7 @@
       [class.show-dropdown]="isDropdownOpen('admin-options')"
     >
       <a class="dropdown-item" routerLink="/requests"> Admin Requests </a>
+      <a class="dropdown-item" routerLink="/manage-ads"> Manage Ads </a>
       <a class="dropdown-item" routerLink="/content-dashboard-admin">
         Content Dashboard
       </a>
@@ -186,6 +187,14 @@
   <div class="content">
     <router-outlet></router-outlet>
   </div>
+
+  
+  <!-- FOOTER ADS -->
+  <app-ad-renderer
+    *ngIf="footerAds.length"
+    [ads]="footerAds"
+    placement="FOOTER"
+  ></app-ad-renderer>
   <footer class="footer border-top mt-3" *ngIf="!hideFooter">
     <div class="xl-container py-3">
       <div class="row justify-content-between gap-2">

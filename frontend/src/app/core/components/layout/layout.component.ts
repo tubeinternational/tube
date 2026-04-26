@@ -13,6 +13,9 @@ import { AuthService } from '../../../auth/services/auth.service';
 import { CommonModule } from '@angular/common';
 import { filter } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
+import { ManageAdsService } from '../../../features/manage-ads/services/manage-ads.service';
+import { Ad } from '../../../features/manage-ads/models/manage-ads.model';
+import { AdRendererComponent } from "../../../shared/components/ad-renderer/ad-renderer.component";
 
 @Component({
   selector: 'app-layout',
@@ -23,7 +26,8 @@ import { Subscription } from 'rxjs';
     CommonModule,
     RouterLinkWithHref,
     RouterLink,
-  ],
+    AdRendererComponent
+],
   templateUrl: './layout.component.html',
   styleUrls: ['./layout.component.scss'],
 })
@@ -43,6 +47,8 @@ export class LayoutComponent implements AfterViewInit, OnDestroy {
   isAdmin = false;
   private routerSub?: Subscription;
 
+  footerAds: Ad[] = [];
+
   private _desktopOpen = false;
   private _unlisteners: Array<() => void> = [];
   hideFooter = false;
@@ -51,6 +57,7 @@ export class LayoutComponent implements AfterViewInit, OnDestroy {
     private renderer: Renderer2,
     private router: Router,
     private authService: AuthService,
+    private adsService: ManageAdsService,
   ) {
     this.authService.user$.subscribe((user) => {
       this.userEmail = user?.email || null;
@@ -70,6 +77,19 @@ export class LayoutComponent implements AfterViewInit, OnDestroy {
 
   logout() {
     this.authService.logout();
+  }
+
+  loadFooterAds() {
+    const device = this.adsService.getDeviceType();
+
+    this.adsService.getAdsByPlacement('FOOTER', device).subscribe({
+      next: (ads) => {
+        this.footerAds = ads.filter((a) => a.is_active);
+      },
+      error: () => {
+        this.footerAds = [];
+      },
+    });
   }
 
   ngAfterViewInit(): void {

@@ -18,16 +18,24 @@
 <!-- EMPTY STATE -->
 <div *ngIf="!loading && videos.length === 0" class="empty">No videos found</div>
 
-<app-ad-renderer *ngIf="homeTopAds.length" [ads]="homeTopAds"></app-ad-renderer>
+<!-- TOP BANNER AD -->
+<app-ad-renderer
+  *ngIf="homeTopAds.length"
+  [ads]="homeTopAds"
+  placement="HOME_TOP"
+></app-ad-renderer>
 
 <!-- VIDEO GRID -->
 <div class="video-grid">
   <ng-container *ngFor="let video of videos; let i = index">
     <app-video-card [video]="video"></app-video-card>
 
-    <!-- Inject ad after every 6 videos -->
-    <ng-container *ngIf="i === 5">
-      <app-ad-renderer [ads]="homeGridAds"></app-ad-renderer>
+    <!-- ✅ Inject ad every 6 videos -->
+    <ng-container *ngIf="(i + 1) % 6 === 0 && homeGridAds.length">
+      <app-ad-renderer
+        [ads]="getGridAdForIndex(i)"
+        placement="HOME_GRID"
+      ></app-ad-renderer>
     </ng-container>
   </ng-container>
 </div>

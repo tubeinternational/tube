@@ -76,6 +76,14 @@ export class HomeComponent implements OnInit {
     });
   }
 
+  getGridAdForIndex(index: number): Ad[] {
+    if (!this.homeGridAds.length) return [];
+
+    // Rotate ads
+    const adIndex = Math.floor(index / 6) % this.homeGridAds.length;
+
+    return [this.homeGridAds[adIndex]];
+  }
   /**
    * =========================
    * LOAD ADS
@@ -89,23 +97,29 @@ export class HomeComponent implements OnInit {
     const deviceType = this.adsService.getDeviceType();
 
     // Fetch ads for multiple HOME placements with device detection
-    this.adsService.getAdsByPlacements(['HOME_TOP', 'HOME_GRID'], deviceType).subscribe({
-      next: (ads) => {
-        // Filter by placement on frontend (backend already filtered by device)
-        this.homeTopAds = ads.filter((a) => a.placement === 'HOME_TOP' && a.is_active);
-        this.homeGridAds = ads.filter((a) => a.placement === 'HOME_GRID' && a.is_active);
+    this.adsService
+      .getAdsByPlacements(['HOME_TOP', 'HOME_GRID'], deviceType)
+      .subscribe({
+        next: (ads) => {
+          // Filter by placement on frontend (backend already filtered by device)
+          this.homeTopAds = ads.filter(
+            (a) => a.placement === 'HOME_TOP' && a.is_active,
+          );
+          this.homeGridAds = ads.filter(
+            (a) => a.placement === 'HOME_GRID' && a.is_active,
+          );
 
-        console.log(
-          `[Home] Loaded ads - Device: ${deviceType}, TOP: ${this.homeTopAds.length}, GRID: ${this.homeGridAds.length}`,
-        );
-      },
-      error: (err) => {
-        console.error('[Home] Failed to load ads:', err);
-        // Gracefully handle ad load failure - don't break video page
-        this.homeTopAds = [];
-        this.homeGridAds = [];
-      },
-    });
+          console.log(
+            `[Home] Loaded ads - Device: ${deviceType}, TOP: ${this.homeTopAds.length}, GRID: ${this.homeGridAds.length}`,
+          );
+        },
+        error: (err) => {
+          console.error('[Home] Failed to load ads:', err);
+          // Gracefully handle ad load failure - don't break video page
+          this.homeTopAds = [];
+          this.homeGridAds = [];
+        },
+      });
   }
 
   fetchVideos(page = this.currentPage): void {
